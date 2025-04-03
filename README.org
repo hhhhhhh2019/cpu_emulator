@@ -37,18 +37,20 @@
 * Ядро
 ** Шины
 - sdb (shared data bus)
-- A1 (first alu input)
-- A2 (second alu input)
-- Ao (alu output)
-- Ro (reg. file output)
-- Rd (reg. file register id)
-- Ab (address bus)
+- ab (address bus)
+- Rout1 (reg. file output 1)
+- Rout2 (reg. file output 2)
 
 ** Микрокоды
-(поставил or вмсто | из-за того, что org-mode определяет это как новый столбец)
 
-| Имя         | Описание |
-|-------------+----------|
+| Имя       | Описание                   |
+|-----------+----------------------------|
+| R1        | read id1 register -> Rout1 |
+| R2        | read id2 register -> Rout2 |
+| num64_ro2 | num64 -> Rout2 bus         |
+| W         | write to id3 register      |
+| ALU_sum   | sum -> sdb                 |
+| ALU_sub   | sub -> sdb                 |
 
 ** Инструкции
 структура инструкции:

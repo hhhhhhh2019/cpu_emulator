@@ -65,27 +65,12 @@ enum Instruction {
 
 
 enum Microcodes {
-	num64_to_sdb,
-	Reg_read,
-	Reg_write,
-	R1_to_Rd,
-	R2_to_Rd,
-	R3_to_Rd,
-	sdb_to_Ri,
-	sdb_to_A2,
-	Ro_to_A1,
-	Ro_to_A2,
-	Ro_to_sdb,
-	ALU_sum,
-	ALU_sub,
-	ALU_mul,
-	ALU_div,
-	ALU_not,
-	ALU_or,
-	ALU_and,
-	ALU_xor,
-	Ao_to_sdb,
-	sdb_to_Ad,
+	R1           = 1 << 0,
+	R2           = 1 << 1,
+	num64_to_ro2 = 1 << 2,
+	W            = 1 << 3,
+	ALU_sum      = 1 << 4,
+	ALU_sub      = 1 << 5,
 };
 
 
@@ -111,17 +96,9 @@ struct Core {
 	uint64_t state;
 
 	uint64_t sdb;
-
-	uint64_t alu_l1; // first input
-	uint64_t alu_l2; // second input
-	uint64_t alu_l3; // output
-
-	uint64_t reg_id;
-	uint64_t reg_inp;
-	uint64_t reg_out;
-
-	uint64_t ram_addr;
-	/* uint64_t ram_value; */
+	uint64_t ab;
+	uint64_t rout1;
+	uint64_t rout2;
 };
 
 

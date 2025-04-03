@@ -51,48 +51,48 @@ static int opcode_len[] = {
 };
 
 
-static struct Opcodes opcodes[] = {
-	[sto]	 = INSTRUCTION(),
-	[loa]	 = INSTRUCTION(),
-	[add]	 = INSTRUCTION(R2_to_Rd, Reg_read, Ro_to_A1, R3_to_Rd, Reg_read, Ro_to_A2, ALU_sum, Ao_to_sdb, R1_to_Rd, Reg_write),
-	[sub]	 = INSTRUCTION(R2_to_Rd, Reg_read, Ro_to_A1, R3_to_Rd, Reg_read, Ro_to_A2, ALU_sub, Ao_to_sdb, R1_to_Rd, Reg_write),
-	[mul]	 = INSTRUCTION(),
-	[idiv]	 = INSTRUCTION(),
-	[addn]	 = INSTRUCTION(R2_to_Rd, Reg_read, Ro_to_A1, num64_to_sdb, sdb_to_A2, ALU_sum, Ao_to_sdb, R1_to_Rd, Reg_write),
-	[subn]	 = INSTRUCTION(R2_to_Rd, Reg_read, Ro_to_A1, num64_to_sdb, sdb_to_A2, ALU_sub, Ao_to_sdb, R1_to_Rd, Reg_write),
-	[muln]	 = INSTRUCTION(),
-	[divn]	 = INSTRUCTION(),
-	[adde]	 = INSTRUCTION(),
-	[addne]	 = INSTRUCTION(),
-	[addg]	 = INSTRUCTION(),
-	[addl]	 = INSTRUCTION(),
-	[addsg]	 = INSTRUCTION(),
-	[addsl]	 = INSTRUCTION(),
-	[notr]	 = INSTRUCTION(),
-	[andr]	 = INSTRUCTION(),
-	[orr]	 = INSTRUCTION(),
-	[xorr]	 = INSTRUCTION(),
-	[shl]	 = INSTRUCTION(),
-	[shr]	 = INSTRUCTION(),
-	[andn]	 = INSTRUCTION(),
-	[orn]	 = INSTRUCTION(),
-	[xorn]	 = INSTRUCTION(),
-	[shln]	 = INSTRUCTION(),
-	[shrn]	 = INSTRUCTION(),
-	[push]	 = INSTRUCTION(),
-	[pop]	 = INSTRUCTION(),
-	[call]	 = INSTRUCTION(),
-	[ret]	 = INSTRUCTION(),
-	[iint]	 = INSTRUCTION(),
-	[iret]	 = INSTRUCTION(),
-	[chst]	 = INSTRUCTION(),
-	[lost]	 = INSTRUCTION(),
-	[stou]	 = INSTRUCTION(),
-	[loau]	 = INSTRUCTION(),
-	[chtp]	 = INSTRUCTION(),
-	[lotp]	 = INSTRUCTION(),
-	[chflag] = INSTRUCTION(),
-	[loflag] = INSTRUCTION(),
+static uint64_t opcodes[] = {
+	[sto]	 = 0,
+	[loa]	 = 0,
+	[add]	 = R1 | R2 | ALU_sum | W,
+	[sub]	 = 0,
+	[mul]	 = 0,
+	[idiv]	 = 0,
+	[addn]	 = R1 | num64_to_ro2 | ALU_sum | W,
+	[subn]	 = 0,
+	[muln]	 = 0,
+	[divn]	 = 0,
+	[adde]	 = 0,
+	[addne]	 = 0,
+	[addg]	 = 0,
+	[addl]	 = 0,
+	[addsg]	 = 0,
+	[addsl]	 = 0,
+	[notr]	 = 0,
+	[andr]	 = 0,
+	[orr]	 = 0,
+	[xorr]	 = 0,
+	[shl]	 = 0,
+	[shr]	 = 0,
+	[andn]	 = 0,
+	[orn]	 = 0,
+	[xorn]	 = 0,
+	[shln]	 = 0,
+	[shrn]	 = 0,
+	[push]	 = 0,
+	[pop]	 = 0,
+	[call]	 = 0,
+	[ret]	 = 0,
+	[iint]	 = 0,
+	[iret]	 = 0,
+	[chst]	 = 0,
+	[lost]	 = 0,
+	[stou]	 = 0,
+	[loau]	 = 0,
+	[chtp]	 = 0,
+	[lotp]	 = 0,
+	[chflag] = 0,
+	[loflag] = 0,
 };
 
 
@@ -141,16 +141,16 @@ enum ALU_OP {
 
 static inline void alu(struct Core* core, enum ALU_OP op) {
 	switch (op) {
-		case SUM: core->alu_l3 = core->alu_l1 + core->alu_l2; break;
-		case SUB: core->alu_l3 = core->alu_l1 - core->alu_l2; break;
-		case MUL: core->alu_l3 = core->alu_l1 * core->alu_l2; break;
-		case DIV: core->alu_l3 = core->alu_l1 / core->alu_l2; break;
-		case NOT: core->alu_l3 = ~core->alu_l1; break;
-		case AND: core->alu_l3 = core->alu_l1 & core->alu_l2; break;
-		case OR:  core->alu_l3 = core->alu_l1 | core->alu_l2; break;
-		case XOR: core->alu_l3 = core->alu_l1 ^ core->alu_l2; break;
-		case SHL: core->alu_l3 = core->alu_l1 << core->alu_l2; break;
-		case SHR: core->alu_l3 = core->alu_l1 >> core->alu_l2; break;
+		case SUM: core->sdb = core->rout1 + core->rout2; break;
+		case SUB: core->sdb = core->rout1 - core->rout2; break;
+		case MUL: core->sdb = core->rout1 * core->rout2; break;
+		case DIV: core->sdb = core->rout1 / core->rout2; break;
+		case NOT: core->sdb = ~core->rout1; break;
+		case AND: core->sdb = core->rout1 & core->rout2; break;
+		case OR:  core->sdb = core->rout1 | core->rout2; break;
+		case XOR: core->sdb = core->rout1 ^ core->rout2; break;
+		case SHL: core->sdb = core->rout1 << core->rout2; break;
+		case SHR: core->sdb = core->rout1 >> core->rout2; break;
 	}
 }
 
@@ -189,44 +189,33 @@ void core_step(struct Core* core) {
 
 	core->registers[PC] += opcode_len[opcode] * 8;
 
-	for (int i = 0; i < opcodes[opcode].count; i++) {
-		switch (opcodes[opcode].microcodes[i]) {
-			case (num64_to_sdb):
-				core->sdb = num64 & bitmask;
-				break;
-			case (R1_to_Rd):
-				core->reg_id = r1;
-				break;
-			case (R2_to_Rd):
-				core->reg_id = r2;
-				break;
-			case (R3_to_Rd):
-				core->reg_id = r3;
-				break;
-			case (sdb_to_A2):
-				core->alu_l2 = core->sdb;
-				break;
-			case (Reg_read):
-				core->reg_out = core->registers[core->reg_id] & bitmask;
-				break;
-			case (Reg_write):
-				core->registers[core->reg_id] = core->sdb;
-				break;
-			case (Ro_to_A1):
-				core->alu_l1 = core->reg_out;
-				break;
-			case (Ro_to_A2):
-				core->alu_l2 = core->reg_out;
-				break;
-			case (Ao_to_sdb):
-				core->sdb = core->alu_l3 & bitmask;
-				break;
-			case (ALU_sum):
-				alu(core, SUM);
-				break;
-			case (ALU_sub):
-				alu(core, SUB);
-				break;
-		}
-	}
+
+	uint64_t ucode = opcodes[opcode];
+
+
+	// first pass
+
+	if (ucode & R1)
+		core->rout1 = core->registers[r2];
+
+	if (ucode & R2)
+		core->rout2 = core->registers[r3];
+
+	if (ucode & num64_to_ro2)
+		core->rout2 = num64;
+
+
+	// second pass
+
+	if (ucode & ALU_sum)
+		alu(core, SUM);
+
+	if (ucode & ALU_sub)
+		alu(core, SUB);
+
+
+	// third pass
+
+	if (ucode & W)
+		core->registers[r1] = core->sdb;
 }
