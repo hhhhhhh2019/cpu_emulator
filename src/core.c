@@ -193,7 +193,7 @@ void core_step(struct Core* core) {
 	uint64_t ucode = opcodes[opcode];
 
 
-	// first pass
+	// first stage
 
 	if (ucode & R1)
 		core->rout1 = core->registers[r2];
@@ -205,7 +205,7 @@ void core_step(struct Core* core) {
 		core->rout2 = num64;
 
 
-	// second pass
+	// second stage
 
 	if (ucode & ALU_sum)
 		alu(core, SUM);
@@ -214,7 +214,7 @@ void core_step(struct Core* core) {
 		alu(core, SUB);
 
 
-	// third pass
+	// third stage
 
 	if (ucode & W)
 		core->registers[r1] = core->sdb;

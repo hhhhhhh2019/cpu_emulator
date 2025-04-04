@@ -96,16 +96,15 @@
 | 27 | push   | r         |                                                      |
 | 28 | pop    | r         |                                                      |
 | 29 | call   | r         |                                                      |
-| 30 | ret    |           |                                                      |
-| 31 | int    | num8      |                                                      |
-| 32 | iret   |           |                                                      |
-| 33 | chst   | r         |                                                      |
-| 34 | lost   | r         |                                                      |
-| 35 | stou   | r num64   | сохранить все регистры USERMODE по адресу r1 + num64 |
-| 36 | loau   | r num64   | загрузить все регистры USERMODE с адреса r1 + num64  |
-| 37 | chtp   | r         |                                                      |
-| 38 | lotp   | r         |                                                      |
-| 39 | chflag | r         |                                                      |
-| 40 | loflag | r         |                                                      |
+| 30 | int    | num8      |                                                      |
+| 31 | iret   |           |                                                      |
+| 32 | chst   | r         |                                                      |
+| 33 | lost   | r         |                                                      |
+| 34 | stou   | r num64   | сохранить все регистры USERMODE по адресу r1 + num64 |
+| 35 | loau   | r num64   | загрузить все регистры USERMODE с адреса r1 + num64  |
+| 36 | chtp   | r         |                                                      |
+| 37 | lotp   | r         |                                                      |
+| 38 | chflag | r         |                                                      |
+| 39 | loflag | r         |                                                      |
 #+TBLFM: $1=@#-2
 #+TBLFM: $1='(format "%x" $1)
