@@ -52,8 +52,8 @@ static int opcode_len[] = {
 
 
 static uint64_t opcodes[] = {
-	[sto]	 = 0,
-	[loa]	 = 0,
+	[sto]	 = R1 | num64_to_ro2 | ALU_sum | sdb_to_ab | R2 | Mw,
+	[loa]	 = R1 | num64_to_ro2 | ALU_sum | sdb_to_ab | Mr | W,
 	[add]	 = R1 | R2 | ALU_sum | W,
 	[sub]	 = 0,
 	[mul]	 = 0,
@@ -82,7 +82,6 @@ static uint64_t opcodes[] = {
 	[push]	 = 0,
 	[pop]	 = 0,
 	[call]	 = 0,
-	[ret]	 = 0,
 	[iint]	 = 0,
 	[iret]	 = 0,
 	[chst]	 = 0,

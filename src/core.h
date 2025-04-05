@@ -70,6 +70,7 @@ enum Microcodes {
 	W            = 1 << 3,
 	ALU_sum      = 1 << 4,
 	ALU_sub      = 1 << 5,
+	sdb_to_ab    = 1 << 6,
 };
 
 

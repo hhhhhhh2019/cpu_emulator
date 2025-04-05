@@ -1,0 +1,68 @@
+flag -> sdb
+ISINTERRUPT off
+ISINTERRUPT on
+num64 -> pc
+num8 * 8 -> ab
+sdb -> ab
+sdb -> flag
+sdb -> pc
+sdb -> r1
+sdb -> state
+sdb -> tp
+state -> sdb
+tp -> sdb
+запись
+обработать их(+,-,*,/,&...)
+проверка USERMODE
+сброс шин(кроме ab)
+сложить с 0(или я сделаю перенос с r1 в sdb)
+считать num64
+считать r2
+считать r3
+считать r3 -> sdb
+считать sp
+увеличение sp
+уменьшение sp
+чтение
+
+0 stage:
+	проверка USERMODE
+	ISINTERRUPT off
+	ISINTERRUPT on
+	num8 * 8 -> ab
+
+1 stage:
+	считать num64
+	считать r2
+	считать r3
+	считать sp
+
+2 stage:
+	обработать их(+,-,*,/,&...)
+
+3 stage:
+	sdb -> ab
+
+4 stage:
+	сброс шин(кроме ab)
+
+5 stage:
+	считать r3 -> sdb
+
+6 stage:
+	запись
+	чтение
+	увеличение sp
+	уменьшение sp
+	num64 -> pc
+
+	flag -> sdb
+	state -> sdb
+	tp -> sdb
+
+7 stage:
+	sdb -> r1
+	sdb -> flag
+	sdb -> pc
+	sdb -> state
+	sdb -> tp
