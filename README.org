@@ -144,36 +144,35 @@ loflag:
 2) flag -> sdb
 3) sdb -> r1
 
-| Имя     | Описание                                     |
-|---------+----------------------------------------------|
-|         | flag -> sdb                                 |
-|         | ISINTERRUPT off                             |
-|         | ISINTERRUPT on                              |
-|         | num64 -> pc                                 |
-|         | num8 * 8 -> ab                              |
-|         | sdb -> ab                                   |
-|         | sdb -> flag                                 |
-|         | sdb -> pc                                   |
-|         | sdb -> r1                                   |
-|         | sdb -> state                                |
-|         | sdb -> tp                                   |
-|         | state -> sdb                                |
-|         | tp -> sdb                                   |
-|         | запись                                      |
-|         | обработать их(+,-,*,/,&...)                 |
-|         | проверка USERMODE                           |
-|         | сброс шин(кроме ab)                         |
-|         | сложить с 0(или я сделаю перенос с r1 в sdb)|
-|         | считать num64                               |
-| R2      | считать r2                                  |
-| R3      | считать r3                                  |
-|         | считать r3 -> sdb                           |
-|         | считать sp                                  |
-|         | увеличение sp                               |
-|         | уменьшение sp                               |
-|         | чтение                                      |
-| ALU_SUM | +                                            |
-| ALU_SUB | -                                            |
+| Имя          | Описание            |
+|--------------+---------------------|
+| inter_off    | ISINTERRUPT off     |
+| inter_on     | ISINTERRUPT on      |
+| num64_to_pc  | num64 -> pc         |
+| num8_to_ab   | num8 * 8 -> ab      |
+| sdb_to_ab    | sdb -> ab           |
+| sdb_to_flag  | sdb -> flag         |
+| sdb_to_pc    | sdb -> pc           |
+| sdb_to_r1    | sdb -> r1           |
+| sdb_to_state | sdb -> state        |
+| sdb_to_tp    | sdb -> tp           |
+| state_to_sdb | state -> sdb        |
+| tp_to_sdb    | tp -> sdb           |
+| flag_to_sdb  | flag -> sdb         |
+| write        | запись              |
+| read         | чтение              |
+| is_usermode  | проверка USERMODE   |
+| bus_reset    | сброс шин(кроме ab) |
+| num64        | считать num64       |
+| r2           | считать r2          |
+| r3           | считать r3          |
+| r3_to_sdb    | считать r3 -> sdb   |
+| sp           | считать sp          |
+| inc_sp       | увеличение sp       |
+| dec_sp       | уменьшение sp       |
+| ALU_SUM      | +                   |
+| ALU_SUB      | -                   |
+| ...          |                     |
 
 ** Инструкции
 структура инструкции:
