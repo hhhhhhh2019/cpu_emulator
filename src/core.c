@@ -168,6 +168,10 @@ void core_step(struct Core* core) {
 	update_registers(core);
 
 	core->registers[0] = 0;
+	core->sdb = 0;
+	core->ab = 0;
+	core->rout1 = 0;
+	core->rout2 = 0;
 
 	print_registers(core);
 
