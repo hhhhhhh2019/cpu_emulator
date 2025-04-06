@@ -163,15 +163,15 @@ loflag:
 | read         | чтение              |
 | is_usermode  | проверка USERMODE   |
 | bus_reset    | сброс шин(кроме ab) |
-| num64        | считать num64       |
-| r2           | считать r2          |
-| r3           | считать r3          |
+| read_num64   | считать num64       |
+| read_r2      | считать r2          |
+| read_r3      | считать r3          |
 | r3_to_sdb    | считать r3 -> sdb   |
-| sp           | считать sp          |
+| read_sp      | считать sp          |
 | inc_sp       | увеличение sp       |
 | dec_sp       | уменьшение sp       |
-| ALU_SUM      | +                   |
-| ALU_SUB      | -                   |
+| ALU_sum      | +                   |
+| ALU_sub      | -                   |
 | ...          |                     |
 
 ** Инструкции

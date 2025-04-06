@@ -64,13 +64,33 @@ enum Instruction {
 
 
 enum Microcodes {
-	R1           = 1 << 0,
-	R2           = 1 << 1,
-	num64_to_ro2 = 1 << 2,
-	W            = 1 << 3,
-	ALU_sum      = 1 << 4,
-	ALU_sub      = 1 << 5,
-	sdb_to_ab    = 1 << 6,
+	inter_off    = 1 << 1,
+	inter_on     = 1 << 2,
+	num64_to_pc  = 1 << 3,
+	num8_to_ab   = 1 << 4,
+	sdb_to_ab    = 1 << 5,
+	sdb_to_flag  = 1 << 6,
+	sdb_to_pc    = 1 << 7,
+	sdb_to_r1    = 1 << 8,
+	sdb_to_state = 1 << 9,
+	sdb_to_tp    = 1 << 10,
+	state_to_sdb = 1 << 11,
+	tp_to_sdb    = 1 << 12,
+	flag_to_sdb  = 1 << 13,
+	write        = 1 << 14,
+	read         = 1 << 15,
+	is_usermode  = 1 << 16,
+	bus_reset    = 1 << 17,
+	read_num64   = 1 << 18,
+	read_r2      = 1 << 19,
+	read_r3      = 1 << 20,
+	r3_to_sdb    = 1 << 21,
+	read_sp      = 1 << 22,
+	inc_sp       = 1 << 23,
+	dec_sp       = 1 << 24,
+	ALU_sum      = 1 << 25,
+	ALU_sub      = 1 << 26,
+	// TODO: other ALU operations
 };
 
 

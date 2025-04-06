@@ -180,9 +180,9 @@ void core_step(struct Core* core) {
 	uint8_t r2       = (instruction >> 12) & 0xf;
 	uint8_t r3       = (instruction >> 16) & 0xf;
 	uint8_t num8     = (instruction >> 20) & 0xf;
-	uint8_t bitwidth =((instruction >> 28) & 0b11) + 1;
+	uint8_t bitwidth = 1 << ((instruction >> 28) & 0b11);
 
-	uint64_t bitmask = bitwidth == 4 ? -1 : (1 << (bitwidth * 8)) - 1;
+	uint64_t bitmask = bitwidth == 8 ? -1 : (1 << (bitwidth * 8)) - 1;
 
 	printf("%d %d %d %d %d %d\n", opcode, r1, r2, r3, num8, bitwidth);
 
@@ -192,19 +192,39 @@ void core_step(struct Core* core) {
 	uint64_t ucode = opcodes[opcode];
 
 
-	// first stage
+	// 0 stage
 
-	if (ucode & R1)
-		core->rout1 = core->registers[r2];
+	if (ucode & is_usermode) {
+		if (!is_kernel_mode(core))
+			return;
+	}
 
-	if (ucode & R2)
-		core->rout2 = core->registers[r3];
+	if (ucode & inter_on)
+		core->state |= ISINTERRUPT;
 
-	if (ucode & num64_to_ro2)
+	if (ucode & inter_off)
+		core->state &= ~ISINTERRUPT;
+
+	if (ucode & num8_to_ab)
+		core->ab = num8 << 3;
+
+
+	// 1 stage
+
+	if (ucode & read_num64)
 		core->rout2 = num64;
 
+	if (ucode & read_r2)
+		core->rout1 = core->registers[r2];
 
-	// second stage
+	if (ucode & read_r3)
+		core->rout2 = core->registers[r3];
+
+	if (ucode & read_sp)
+		core->rout1 = core->registers[SP];
+
+
+	// 2 stage
 
 	if (ucode & ALU_sum)
 		alu(core, SUM);
@@ -212,9 +232,75 @@ void core_step(struct Core* core) {
 	if (ucode & ALU_sub)
 		alu(core, SUB);
 
+	// TODO: other ALU operations
 
-	// third stage
 
-	if (ucode & W)
+	// 3 stage
+
+	if (ucode & sdb_to_ab)
+		core->ab = core->sdb;
+
+
+	// 4 stage
+
+	if (ucode & bus_reset) {
+		core->rout1 = 0;
+		core->rout2 = 0;
+		core->sdb = 0;
+	}
+
+
+	// 5 stage
+
+	if (ucode & r3_to_sdb)
+		core->sdb = core->registers[r3];
+
+
+	// 6 stage
+
+	if (ucode & write)
+		mmu_write(&core->cpu->mmu,
+		          core->state & PAGING, core->registers[TP],
+		          core->ab, bitwidth, core->sdb);
+
+	if (ucode & read)
+		core->sdb = mmu_read(&core->cpu->mmu,
+		          core->state & PAGING, core->registers[TP],
+		          core->ab, &perm) & bitmask;
+
+	if (ucode & inc_sp)
+		core->registers[SP] += bitwidth;
+
+	if (ucode & dec_sp)
+		core->registers[SP] += bitwidth;
+
+	if (ucode & num64_to_pc)
+		core->registers[PC] = num64;
+
+	if (ucode & flag_to_sdb)
+		core->sdb = core->registers[FLAG];
+
+	if (ucode & state_to_sdb)
+		core->sdb = core->state;
+
+	if (ucode & tp_to_sdb)
+		core->sdb = core->registers[TP];
+
+
+	// 7 stage
+
+	if (ucode & sdb_to_r1)
 		core->registers[r1] = core->sdb;
+
+	if (ucode & sdb_to_flag)
+		core->registers[FLAG] = core->sdb;
+
+	if (ucode & sdb_to_pc)
+		core->registers[PC] = core->sdb;
+
+	if (ucode & sdb_to_state)
+		core->state = core->sdb;
+
+	if (ucode & sdb_to_tp)
+		core->registers[TP] = core->sdb;
 }
