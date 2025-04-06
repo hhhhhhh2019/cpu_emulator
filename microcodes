@@ -58,11 +58,12 @@ tp -> sdb
 	чтение
 	увеличение sp
 	уменьшение sp
-	r3 -> pc
 
 	flag -> sdb
 	state -> sdb
 	tp -> sdb
+
+	r3 -> pc
 
 7 stage:
 	sdb -> r1

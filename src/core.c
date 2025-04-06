@@ -37,7 +37,6 @@ static int opcode_len[] = {
 	[push]	 = 1,
 	[pop]	 = 1,
 	[call]	 = 1,
-	[ret]	 = 1,
 	[iint]	 = 1,
 	[iret]	 = 1,
 	[chst]	 = 1,
@@ -81,7 +80,7 @@ static uint64_t opcodes[] = {
 	[shrn]	 = 0,
 	[push]	 = read_sp | ALU_sum | sdb_to_ab | r3_to_sdb | write | inc_sp,
 	[pop]	 = read_sp | ALU_sum | sdb_to_ab | read | sdb_to_r1 | dec_sp,
-	[call]	 = read_sp | ALU_sum | sdb_to_ab | r3_to_sdb | write | inc_sp | num64_to_pc,
+	[call]	 = read_sp | ALU_sum | sdb_to_ab | pc_to_sdb | write | inc_sp | r3_to_pc,
 	[iint]	 = inter_on | num8_to_ab | read | sdb_to_pc,
 	[iret]	 = inter_off,
 	[chst]	 = is_usermode | read_r2 | ALU_sum | sdb_to_state,
@@ -191,8 +190,6 @@ void core_step(struct Core* core) {
 
 	printf("%d %d %d %d %d %d\n", opcode, r1, r2, r3, num8, bitwidth);
 
-	core->registers[PC] += opcode_len[opcode] * 8;
-
 
 	uint64_t ucode = opcodes[opcode];
 
@@ -265,6 +262,9 @@ void core_step(struct Core* core) {
 		core->sdb = core->registers[r3];
 
 
+	core->registers[PC] += opcode_len[opcode] * 8;
+
+
 	// 6 stage
 
 	if (ucode & write)
@@ -281,10 +281,7 @@ void core_step(struct Core* core) {
 		core->registers[SP] += bitwidth;
 
 	if (ucode & dec_sp)
-		core->registers[SP] += bitwidth;
-
-	if (ucode & num64_to_pc)
-		core->registers[PC] = num64;
+		core->registers[SP] -= bitwidth;
 
 	if (ucode & flag_to_sdb)
 		core->sdb = core->registers[FLAG];
@@ -294,6 +291,9 @@ void core_step(struct Core* core) {
 
 	if (ucode & tp_to_sdb)
 		core->sdb = core->registers[TP];
+
+	if (ucode & r3_to_pc)
+		core->registers[PC] = core->registers[r3];
 
 
 	// 7 stage
