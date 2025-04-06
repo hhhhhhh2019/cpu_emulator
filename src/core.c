@@ -214,6 +214,9 @@ void core_step(struct Core* core) {
 	if (ucode & num8_to_ab)
 		core->ab = num8 << 3;
 
+	if (ucode & dec_sp)
+		core->registers[SP] -= bitwidth;
+
 
 	// 1 stage
 
@@ -279,9 +282,6 @@ void core_step(struct Core* core) {
 
 	if (ucode & inc_sp)
 		core->registers[SP] += bitwidth;
-
-	if (ucode & dec_sp)
-		core->registers[SP] -= bitwidth;
 
 	if (ucode & flag_to_sdb)
 		core->sdb = core->registers[FLAG];

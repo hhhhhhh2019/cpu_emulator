@@ -70,6 +70,8 @@ uint64_t mmu_read(struct MMU* mmu, char vaddr, uint64_t tp, uint64_t addr, char*
 		return *(uint64_t*)(mmu->mmio[i].registers + addr); // TODO: check for out of bound
 	}
 
+	printf("read: %016lx from %lx\n", *(uint64_t*)(mmu->cpu->motherboard->ram + addr), addr);
+
 	return *(uint64_t*)(mmu->cpu->motherboard->ram + addr);
 }
 
@@ -89,6 +91,8 @@ void mmu_write(struct MMU* mmu, char vaddr, uint64_t tp, uint64_t addr, char siz
 			mmu->mmio[i].registers[addr + j] = (value >> (j * 8)) & 0xff;
 	}
 
-	for (int j = 0; j < size; j++)
+	for (int j = 0; j < size; j++) {
 		mmu->cpu->motherboard->ram[addr + j] = (value >> (j * 8)) & 0xff;
+		printf("write: %02lx to %lx\n", (value >> (j * 8)) & 0xff, addr + j);
+	}
 }

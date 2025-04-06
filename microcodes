@@ -31,6 +31,7 @@ tp -> sdb
 	ISINTERRUPT off
 	ISINTERRUPT on
 	num8 * 8 -> ab
+	уменьшение sp
 
 1 stage:
 	считать num64
@@ -57,7 +58,6 @@ tp -> sdb
 	запись
 	чтение
 	увеличение sp
-	уменьшение sp
 
 	flag -> sdb
 	state -> sdb
