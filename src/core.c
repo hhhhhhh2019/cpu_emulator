@@ -186,9 +186,9 @@ void core_step(struct Core* core) {
 	uint8_t num8     = (instruction >> 20) & 0xf;
 	uint8_t bitwidth = 1 << ((instruction >> 28) & 0b11);
 
-	uint64_t bitmask = bitwidth == 8 ? -1 : (1 << (bitwidth * 8)) - 1;
+	uint64_t bitmask = bitwidth == 8 ? -1 : ((uint64_t)1 << (bitwidth * 8)) - 1;
 
-	printf("%d %d %d %d %d %d\n", opcode, r1, r2, r3, num8, bitwidth);
+	printf("%d %d %d %d %d %d %016lx\n", opcode, r1, r2, r3, num8, bitwidth, bitmask);
 
 
 	uint64_t ucode = opcodes[opcode];
