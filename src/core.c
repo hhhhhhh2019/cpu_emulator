@@ -52,14 +52,14 @@ static int opcode_len[] = {
 
 
 static uint64_t opcodes[] = {
-	[sto]	 = R1 | num64_to_ro2 | ALU_sum | sdb_to_ab | R2 | Mw,
-	[loa]	 = R1 | num64_to_ro2 | ALU_sum | sdb_to_ab | Mr | W,
-	[add]	 = R1 | R2 | ALU_sum | W,
-	[sub]	 = 0,
+	[sto]	 = read_r2 | read_num64 | ALU_sum | sdb_to_ab | bus_reset | r3_to_sdb | write,
+	[loa]	 = read_r2 | read_num64 | ALU_sum | sdb_to_ab | bus_reset | read | sdb_to_r1,
+	[add]	 = read_r2 | read_r3 | ALU_sum | sdb_to_r1,
+	[sub]	 = read_r2 | read_r3 | ALU_sub | sdb_to_r1,
 	[mul]	 = 0,
 	[idiv]	 = 0,
-	[addn]	 = R1 | num64_to_ro2 | ALU_sum | W,
-	[subn]	 = 0,
+	[addn]	 = read_r2 | read_num64 | ALU_sum | sdb_to_r1,
+	[subn]	 = read_r2 | read_num64 | ALU_sub | sdb_to_r1,
 	[muln]	 = 0,
 	[divn]	 = 0,
 	[adde]	 = 0,
@@ -79,19 +79,19 @@ static uint64_t opcodes[] = {
 	[xorn]	 = 0,
 	[shln]	 = 0,
 	[shrn]	 = 0,
-	[push]	 = 0,
-	[pop]	 = 0,
-	[call]	 = 0,
-	[iint]	 = 0,
-	[iret]	 = 0,
-	[chst]	 = 0,
-	[lost]	 = 0,
+	[push]	 = read_sp | ALU_sum | sdb_to_ab | r3_to_sdb | write | inc_sp,
+	[pop]	 = read_sp | ALU_sum | sdb_to_ab | read | sdb_to_r1 | dec_sp,
+	[call]	 = read_sp | ALU_sum | sdb_to_ab | r3_to_sdb | write | inc_sp | num64_to_pc,
+	[iint]	 = inter_on | num8_to_ab | read | sdb_to_pc,
+	[iret]	 = inter_off,
+	[chst]	 = is_usermode | read_r2 | ALU_sum | sdb_to_state,
+	[lost]	 = is_usermode | state_to_sdb | sdb_to_r1,
 	[stou]	 = 0,
 	[loau]	 = 0,
-	[chtp]	 = 0,
-	[lotp]	 = 0,
-	[chflag] = 0,
-	[loflag] = 0,
+	[chtp]	 = is_usermode | read_r2 | ALU_sum | sdb_to_tp,
+	[lotp]	 = is_usermode | tp_to_sdb | sdb_to_r1,
+	[chflag] = is_usermode | read_r2 | ALU_sum | sdb_to_flag,
+	[loflag] = is_usermode | flag_to_sdb | sdb_to_r1,
 };
 
 
@@ -154,14 +154,19 @@ static inline void alu(struct Core* core, enum ALU_OP op) {
 }
 
 
-void core_step(struct Core* core) {
-	if (!(core->state & ENABLED))
-		return;
-
+static void update_registers(struct Core* core) {
 	if (is_kernel_mode(core))
 		core->registers = core->registersk;
 	else
 		core->registers = core->registersu;
+}
+
+
+void core_step(struct Core* core) {
+	if (!(core->state & ENABLED))
+		return;
+
+	update_registers(core);
 
 	core->registers[0] = 0;
 
@@ -199,11 +204,15 @@ void core_step(struct Core* core) {
 			return;
 	}
 
-	if (ucode & inter_on)
+	if (ucode & inter_on) {
 		core->state |= ISINTERRUPT;
+		update_registers(core);
+	}
 
-	if (ucode & inter_off)
+	if (ucode & inter_off) {
 		core->state &= ~ISINTERRUPT;
+		update_registers(core);
+	}
 
 	if (ucode & num8_to_ab)
 		core->ab = num8 << 3;
