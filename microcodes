@@ -49,6 +49,7 @@ tp -> sdb
 
 5 stage:
 	считать r3 -> sdb
+	считать pc -> sdb
 
 тут будет pc += размер инструкции
 
@@ -57,7 +58,7 @@ tp -> sdb
 	чтение
 	увеличение sp
 	уменьшение sp
-	num64 -> pc
+	r3 -> pc
 
 	flag -> sdb
 	state -> sdb
