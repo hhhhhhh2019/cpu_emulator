@@ -98,10 +98,10 @@ call:
 2) сложить с 0(или я сделаю перенос с r1 в sdb)
 3) sdb -> ab(или я сделаю r1 -> ab)
 4) сброс шин(кроме ab)
-5) считать r3 -> sdb
+5) считать pc -> sdb
 6) запись
 7) увеличение sp
-8) num64 -> pc
+8) r3 -> pc
 
 int:
 1) ISINTERRUPT on
@@ -149,7 +149,8 @@ loflag:
 |--------------+---------------------|
 | inter_off    | ISINTERRUPT off     |
 | inter_on     | ISINTERRUPT on      |
-| num64_to_pc  | num64 -> pc         |
+| pc_to_sdb    | pc -> sdb           |
+| r3_to_pc     | r3 -> pc            |
 | num8_to_ab   | num8 * 8 -> ab      |
 | sdb_to_ab    | sdb -> ab           |
 | sdb_to_flag  | sdb -> flag         |

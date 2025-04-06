@@ -1,7 +1,8 @@
 flag -> sdb
 ISINTERRUPT off
 ISINTERRUPT on
-num64 -> pc
+pc -> sdb
+r3 -> pc
 num8 * 8 -> ab
 sdb -> ab
 sdb -> flag
@@ -48,6 +49,8 @@ tp -> sdb
 
 5 stage:
 	считать r3 -> sdb
+
+тут будет pc += размер инструкции
 
 6 stage:
 	запись
