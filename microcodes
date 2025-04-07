@@ -25,9 +25,15 @@ tp -> sdb
 увеличение sp
 уменьшение sp
 чтение
+проверка zero
+проверка carry
+проверка sign
 
 0 stage:
 	проверка USERMODE
+	проверка zero
+	проверка carry
+	проверка sign
 	ISINTERRUPT off
 	ISINTERRUPT on
 	num8 * 8 -> ab

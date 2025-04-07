@@ -7,44 +7,41 @@
 
 
 static int opcode_len[] = {
-	[sto]	 = 2,
-	[loa]	 = 2,
-	[add]	 = 1,
-	[sub]	 = 1,
-	[mul]	 = 1,
-	[idiv]	 = 1,
-	[addn]	 = 2,
-	[subn]	 = 2,
-	[muln]	 = 2,
-	[divn]	 = 2,
-	[adde]	 = 2,
-	[addne]	 = 2,
-	[addg]	 = 2,
-	[addl]	 = 2,
-	[addsg]	 = 2,
-	[addsl]	 = 2,
-	[notr]	 = 1,
-	[andr]	 = 1,
-	[orr]	 = 1,
-	[xorr]	 = 1,
-	[shl]	 = 1,
-	[shr]	 = 1,
-	[andn]	 = 2,
-	[orn]	 = 2,
-	[xorn]	 = 2,
-	[shln]	 = 2,
-	[shrn]	 = 2,
-	[push]	 = 1,
-	[pop]	 = 1,
-	[call]	 = 1,
-	[iint]	 = 1,
-	[iret]	 = 1,
-	[chst]	 = 1,
-	[lost]	 = 1,
-	[stou]	 = 2,
-	[loau]	 = 2,
-	[chtp]	 = 1,
-	[lotp]	 = 1,
+	[sto]    = 2,
+	[loa]    = 2,
+	[add]    = 1,
+	[sub]    = 1,
+	[mul]    = 1,
+	[idiv]   = 1,
+	[addn]   = 2,
+	[subn]   = 2,
+	[muln]   = 2,
+	[divn]   = 2,
+	[addz]   = 2,
+	[addc]   = 2,
+	[adds]   = 2,
+	[notr]   = 1,
+	[andr]   = 1,
+	[orr]    = 1,
+	[xorr]   = 1,
+	[shl]    = 1,
+	[shr]    = 1,
+	[andn]   = 2,
+	[orn]    = 2,
+	[xorn]   = 2,
+	[shln]   = 2,
+	[shrn]   = 2,
+	[push]   = 1,
+	[pop]    = 1,
+	[call]   = 1,
+	[iint]   = 1,
+	[iret]   = 1,
+	[chst]   = 1,
+	[lost]   = 1,
+	[stou]   = 2,
+	[loau]   = 2,
+	[chtp]   = 1,
+	[lotp]   = 1,
 	[chflag] = 1,
 	[loflag] = 1,
 };
@@ -61,12 +58,9 @@ static uint64_t opcodes[] = {
 	[subn]	 = read_r2 | read_num64 | ALU_sub | sdb_to_r1,
 	[muln]	 = 0,
 	[divn]	 = 0,
-	[adde]	 = 0,
-	[addne]	 = 0,
-	[addg]	 = 0,
-	[addl]	 = 0,
-	[addsg]	 = 0,
-	[addsl]	 = 0,
+	[addz]   = is_zero | read_r2 | read_num64 | ALU_sum | sdb_to_r1,
+	[addc]   = is_carry | read_r2 | read_num64 | ALU_sum | sdb_to_r1,
+	[adds]   = is_sign | read_r2 | read_num64 | ALU_sum | sdb_to_r1,
 	[notr]	 = 0,
 	[andr]	 = 0,
 	[orr]	 = 0,
@@ -201,8 +195,10 @@ void core_step(struct Core* core) {
 	// 0 stage
 
 	if (ucode & is_usermode) {
-		if (!is_kernel_mode(core))
+		if (!is_kernel_mode(core)) {
+			core->registers[PC] += opcode_len[opcode] * 8;
 			return;
+		}
 	}
 
 	if (ucode & inter_on) {
@@ -220,6 +216,27 @@ void core_step(struct Core* core) {
 
 	if (ucode & dec_sp)
 		core->registers[SP] -= bitwidth;
+
+	if (ucode & is_zero) {
+		if ((core->registers[FLAG] & zero) == 0) {
+			core->registers[PC] += opcode_len[opcode] * 8;
+			return;
+		}
+	}
+
+	if (ucode & is_carry) {
+		if ((core->registers[FLAG] & carry) == 0) {
+			core->registers[PC] += opcode_len[opcode] * 8;
+			return;
+		}
+	}
+
+	if (ucode & is_sign) {
+		if ((core->registers[FLAG] & sign) == 0) {
+			core->registers[PC] += opcode_len[opcode] * 8;
+			return;
+		}
+	}
 
 
 	// 1 stage

@@ -200,35 +200,32 @@ loflag:
 |  7 | sub    | r r num64 |                                                      |
 |  8 | mul    | r r num64 |                                                      |
 |  9 | div    | r r num64 |                                                      |
-| 10 | adde   | r r num64 |                                                      |
-| 11 | addne  | r r num64 |                                                      |
-| 12 | addg   | r r num64 |                                                      |
-| 13 | addl   | r r num64 |                                                      |
-| 14 | addsg  | r r num64 |                                                      |
-| 15 | addsl  | r r num64 |                                                      |
-| 16 | not    | r r       |                                                      |
-| 17 | and    | r r r     |                                                      |
-| 18 | or     | r r r     |                                                      |
-| 19 | xor    | r r r     |                                                      |
-| 20 | shl    | r r r     |                                                      |
-| 21 | shr    | r r r     |                                                      |
-| 22 | and    | r r num64 |                                                      |
-| 23 | or     | r r num64 |                                                      |
-| 24 | xor    | r r num64 |                                                      |
-| 25 | shl    | r r num64 |                                                      |
-| 26 | shr    | r r num64 |                                                      |
-| 27 | push   | r         |                                                      |
-| 28 | pop    | r         |                                                      |
-| 29 | call   | r         |                                                      |
-| 30 | int    | num8      |                                                      |
-| 31 | iret   |           |                                                      |
-| 32 | chst   | r         |                                                      |
-| 33 | lost   | r         |                                                      |
-| 34 | stou   | r num64   | сохранить все регистры USERMODE по адресу r1 + num64 |
-| 35 | loau   | r num64   | загрузить все регистры USERMODE с адреса r1 + num64  |
-| 36 | chtp   | r         |                                                      |
-| 37 | lotp   | r         |                                                      |
-| 38 | chflag | r         |                                                      |
-| 39 | loflag | r         |                                                      |
+| 10 | addz   | r r num64 |                                                      |
+| 11 | addc   | r r num64 |                                                      |
+| 12 | adds   | r r num64 |                                                      |
+| 13 | not    | r r       |                                                      |
+| 14 | and    | r r r     |                                                      |
+| 15 | or     | r r r     |                                                      |
+| 16 | xor    | r r r     |                                                      |
+| 17 | shl    | r r r     |                                                      |
+| 18 | shr    | r r r     |                                                      |
+| 19 | and    | r r num64 |                                                      |
+| 20 | or     | r r num64 |                                                      |
+| 21 | xor    | r r num64 |                                                      |
+| 22 | shl    | r r num64 |                                                      |
+| 23 | shr    | r r num64 |                                                      |
+| 24 | push   | r         |                                                      |
+| 25 | pop    | r         |                                                      |
+| 26 | call   | r         |                                                      |
+| 27 | int    | num8      |                                                      |
+| 28 | iret   |           |                                                      |
+| 29 | chst   | r         |                                                      |
+| 30 | lost   | r         |                                                      |
+| 31 | stou   | r num64   | сохранить все регистры USERMODE по адресу r1 + num64 |
+| 32 | loau   | r num64   | загрузить все регистры USERMODE с адреса r1 + num64  |
+| 33 | chtp   | r         |                                                      |
+| 34 | lotp   | r         |                                                      |
+| 35 | chflag | r         |                                                      |
+| 36 | loflag | r         |                                                      |
 #+TBLFM: $1=@#-2
 #+TBLFM: $1='(format "%x" $1)
