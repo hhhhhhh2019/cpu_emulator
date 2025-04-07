@@ -152,7 +152,7 @@ static inline void alu(struct Core* core, enum ALU_OP op, int bitwidth) {
 	if (core->sdb == 0)
 		core->registers[FLAG] |= zero;
 
-	if (core->sdb & (1 << bitwidth))
+	if (core->sdb & (1 << (bitwidth - 1)))
 		core->registers[FLAG] |= sign;
 
 	switch (op) {
