@@ -131,7 +131,7 @@ enum ALU_OP {
 	SHR,
 };
 
-static inline void alu(struct Core* core, enum ALU_OP op) {
+static inline void alu(struct Core* core, enum ALU_OP op, int bitwidth) {
 	switch (op) {
 		case SUM: core->sdb = core->rout1 + core->rout2; break;
 		case SUB: core->sdb = core->rout1 - core->rout2; break;
@@ -143,6 +143,24 @@ static inline void alu(struct Core* core, enum ALU_OP op) {
 		case XOR: core->sdb = core->rout1 ^ core->rout2; break;
 		case SHL: core->sdb = core->rout1 << core->rout2; break;
 		case SHR: core->sdb = core->rout1 >> core->rout2; break;
+	}
+
+	core->registers[FLAG] &= ~zero;
+	core->registers[FLAG] &= ~carry;
+	core->registers[FLAG] &= ~sign;
+
+	if (core->sdb == 0)
+		core->registers[FLAG] |= zero;
+
+	if (core->sdb & (1 << bitwidth))
+		core->registers[FLAG] |= sign;
+
+	switch (op) {
+		case SUM: core->registers[FLAG] |=
+			((((uint64_t)-1) - core->rout1) > core->rout2) ? carry : 0; break;
+		case SUB: core->registers[FLAG] |=
+			(core->rout2 > core->rout1) ? carry : 0; break;
+		// TODO
 	}
 }
 
@@ -182,9 +200,9 @@ void core_step(struct Core* core) {
 	uint8_t r2       = (instruction >> 12) & 0xf;
 	uint8_t r3       = (instruction >> 16) & 0xf;
 	uint8_t num8     = (instruction >> 20) & 0xf;
-	uint8_t bitwidth = 1 << ((instruction >> 28) & 0b11);
+	uint8_t bitwidth = (1 << ((instruction >> 28) & 0b11)) * 8;
 
-	uint64_t bitmask = bitwidth == 8 ? -1 : ((uint64_t)1 << (bitwidth * 8)) - 1;
+	uint64_t bitmask = bitwidth == 64 ? -1 : ((uint64_t)1 << bitwidth) - 1;
 
 	printf("%d %d %d %d %d %d %016lx\n", opcode, r1, r2, r3, num8, bitwidth, bitmask);
 
@@ -257,10 +275,10 @@ void core_step(struct Core* core) {
 	// 2 stage
 
 	if (ucode & ALU_sum)
-		alu(core, SUM);
+		alu(core, SUM, bitwidth);
 
 	if (ucode & ALU_sub)
-		alu(core, SUB);
+		alu(core, SUB, bitwidth);
 
 	// TODO: other ALU operations
 
