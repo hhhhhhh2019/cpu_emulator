@@ -5,7 +5,7 @@ DEBUG=1
 LIBS=
 
 CC?=gcc
-LD=gcc
+LD=$(CC)
 
 CC_FLAGS = -c
 LD_FLAGS =
@@ -28,7 +28,7 @@ OBJECTS = $(SOURCES:src/%.c=build/%.o)
 build/%.o: src/%.c
 	$(CC) $(CC_FLAGS) $^ -o $@
 
-all: $(SOURCES)
+all: $(OBJECTS)
 	$(LD) $(LD_FLAGS) $^ -o $(OUT)
 
 clean:
