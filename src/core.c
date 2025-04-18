@@ -360,11 +360,13 @@ void core_step(struct Core* core) {
 
 void core_int(struct Core* core, char id) {
 	core->int_queue[++core->int_queue_head] = id;
+	core->int_queue_head %= 256;
 }
 
 
 void core_handle_interrupt(struct Core* core) {
 	char id = core->int_queue[core->int_queue_tail++];
+	core->int_queue_tail %= 256;
 
 	core->state |= ISINTERRUPT;
 
