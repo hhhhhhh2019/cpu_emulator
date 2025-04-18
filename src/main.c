@@ -43,11 +43,17 @@ int main() {
 	};
 	mmu_init(&motherboard.cpu.mmu, &motherboard.cpu);
 
-	for (int i = 0; i < motherboard.cpu.cores_number; i++)
+	for (int i = 0; i < 256; i++)
+		motherboard.cpu.apic.int_table[i] = 0;
+
+	for (int i = 0; i < motherboard.cpu.cores_number; i++) {
 		motherboard.cpu.cores[i].cpu = &motherboard.cpu;
+		for (int j = 0; j < 18; j++)
+			motherboard.cpu.cores[i].registersk[j] = 0;
+		motherboard.cpu.cores[i].int_queue_head = 0;
+		motherboard.cpu.cores[i].int_queue_tail = 0;
+	}
 	motherboard.cpu.cores[0].state = ENABLED;
-	for (int i = 0; i < 18; i++)
-		motherboard.cpu.cores[0].registersk[i] = 0;
 	motherboard.cpu.cores[0].registersk[PC] = BIOS_OFFSET;
 
 	while (1) {

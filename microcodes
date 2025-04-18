@@ -1,12 +1,10 @@
 flag -> sdb
 ISINTERRUPT off
-ISINTERRUPT on
+num8 -> core_int
 pc -> sdb
 r3 -> pc
-num8 * 8 -> ab
 sdb -> ab
 sdb -> flag
-sdb -> pc
 sdb -> r1
 sdb -> r1_u
 sdb -> state
@@ -17,7 +15,6 @@ tp -> sdb
 обработать их(+,-,*,/,&...)
 проверка USERMODE
 сброс шин(кроме ab)
-сложить с 0(или я сделаю перенос с r1 в sdb)
 считать num64
 считать r2
 считать r3
@@ -37,9 +34,8 @@ tp -> sdb
 	проверка carry
 	проверка sign
 	ISINTERRUPT off
-	ISINTERRUPT on
-	num8 * 8 -> ab
 	уменьшение sp
+	num8 -> core_int
 
 1 stage:
 	считать num64
@@ -78,6 +74,5 @@ tp -> sdb
 	sdb -> r1
 	sdb -> r1_u
 	sdb -> flag
-	sdb -> pc
 	sdb -> state
 	sdb -> tp

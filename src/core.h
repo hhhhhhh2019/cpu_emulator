@@ -58,49 +58,45 @@ enum Instruction {
 	iret   = 0x22,
 	chst   = 0x23,
 	lost   = 0x24,
-	stou   = 0x25,
-	loau   = 0x26,
-	chtp   = 0x27,
-	lotp   = 0x28,
-	chflag = 0x29,
-	loflag = 0x2a,
-	utok   = 0x2b,
-	ktou   = 0x2c,
+	chtp   = 0x25,
+	lotp   = 0x26,
+	chflag = 0x27,
+	loflag = 0x28,
+	utok   = 0x29,
+	ktou   = 0x2a,
 };
 
 
-#define inter_off    (1l << 0)
-#define inter_on     (1l << 1)
-#define pc_to_sdb    (1l << 2)
-#define r3_to_pc     (1l << 3)
-#define num8_to_ab   (1l << 4)
-#define sdb_to_ab    (1l << 5)
-#define sdb_to_flag  (1l << 6)
-#define sdb_to_pc    (1l << 7)
-#define sdb_to_r1    (1l << 8)
-#define sdb_to_r1_u  (1l << 9)
-#define sdb_to_state (1l << 10)
-#define sdb_to_tp    (1l << 11)
-#define state_to_sdb (1l << 12)
-#define tp_to_sdb    (1l << 13)
-#define flag_to_sdb  (1l << 14)
-#define _write       (1l << 15)
-#define _read        (1l << 16)
-#define is_usermode  (1l << 17)
-#define is_zero      (1l << 18)
-#define is_carry     (1l << 19)
-#define is_sign      (1l << 20)
-#define bus_reset    (1l << 21)
-#define read_num64   (1l << 22)
-#define read_r2      (1l << 23)
-#define read_r3      (1l << 24)
-#define r3_to_sdb    (1l << 25)
-#define r3_u_to_sdb  (1l << 26)
-#define read_sp      (1l << 27)
-#define inc_sp       (1l << 28)
-#define dec_sp       (1l << 29)
-#define ALU_sum      (1l << 30)
-#define ALU_sub      (1l << 31)
+#define inter_off        (1l << 0)
+#define num8_to_core_int (1l << 1)
+#define pc_to_sdb        (1l << 2)
+#define r3_to_pc         (1l << 3)
+#define sdb_to_ab        (1l << 4)
+#define sdb_to_flag      (1l << 5)
+#define sdb_to_r1        (1l << 6)
+#define sdb_to_r1_u      (1l << 7)
+#define sdb_to_state     (1l << 8)
+#define sdb_to_tp        (1l << 9)
+#define state_to_sdb     (1l << 10)
+#define tp_to_sdb        (1l << 11)
+#define flag_to_sdb      (1l << 12)
+#define _write           (1l << 13)
+#define _read            (1l << 14)
+#define is_usermode      (1l << 15)
+#define is_zero          (1l << 16)
+#define is_carry         (1l << 17)
+#define is_sign          (1l << 18)
+#define bus_reset        (1l << 19)
+#define read_num64       (1l << 20)
+#define read_r2          (1l << 21)
+#define read_r3          (1l << 22)
+#define r3_to_sdb        (1l << 23)
+#define r3_u_to_sdb      (1l << 24)
+#define read_sp          (1l << 25)
+#define inc_sp           (1l << 26)
+#define dec_sp           (1l << 27)
+#define ALU_sum          (1l << 28)
+#define ALU_sub          (1l << 29)
 // TODO: other ALU operations
 
 
@@ -129,11 +125,17 @@ struct Core {
 	uint64_t ab;
 	uint64_t rout1;
 	uint64_t rout2;
+
+	char int_queue[256];
+	int int_queue_head;
+	int int_queue_tail;
 };
 
 
 void print_registers(struct Core*);
 void core_step(struct Core*);
+void core_int(struct Core*, char id);
+void core_handle_interrupt(struct Core*);
 
 
 #endif

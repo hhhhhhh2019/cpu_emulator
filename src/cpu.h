@@ -4,6 +4,7 @@
 
 #include "core.h"
 #include "mmu.h"
+#include "apic.h"
 
 
 struct Motherboard;
@@ -14,6 +15,7 @@ struct CPU {
 	struct Core* cores;
 
 	struct MMU mmu;
+	struct APIC apic;
 };
 
 

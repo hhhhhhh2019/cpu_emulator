@@ -38,8 +38,6 @@ static int opcode_len[] = {
 	[iret]   = 1,
 	[chst]   = 1,
 	[lost]   = 1,
-	[stou]   = 2,
-	[loau]   = 2,
 	[chtp]   = 1,
 	[lotp]   = 1,
 	[chflag] = 1,
@@ -75,12 +73,10 @@ static uint64_t opcodes[] = {
 	[push]	 = read_sp | ALU_sum | sdb_to_ab | r3_to_sdb | _write | dec_sp,
 	[pop]	 = read_sp | ALU_sum | sdb_to_ab | _read | sdb_to_r1 | inc_sp,
 	[call]	 = read_sp | ALU_sum | sdb_to_ab | pc_to_sdb | _write | dec_sp | r3_to_pc,
-	[iint]	 = inter_on | num8_to_ab | _read | sdb_to_pc,
+	[iint]	 = num8_to_core_int,
 	[iret]	 = inter_off,
 	[chst]	 = is_usermode | read_r2 | ALU_sum | sdb_to_state,
 	[lost]	 = is_usermode | state_to_sdb | sdb_to_r1,
-	[stou]	 = 0,
-	[loau]	 = 0,
 	[chtp]	 = is_usermode | read_r2 | ALU_sum | sdb_to_tp,
 	[lotp]	 = is_usermode | tp_to_sdb | sdb_to_r1,
 	[chflag] = is_usermode | read_r2 | ALU_sum | sdb_to_flag,
@@ -179,6 +175,11 @@ void core_step(struct Core* core) {
 	if (!(core->state & ENABLED))
 		return;
 
+	if (core->state & INTERRUPTS && core->int_queue_head != core->int_queue_tail) {
+		core_handle_interrupt(core);
+		return;
+	}
+
 	update_registers(core);
 
 	core->registers[0] = 0;
@@ -221,18 +222,10 @@ void core_step(struct Core* core) {
 		}
 	}
 
-	if (ucode & inter_on) {
-		core->state |= ISINTERRUPT;
-		update_registers(core);
-	}
-
 	if (ucode & inter_off) {
 		core->state &= ~ISINTERRUPT;
 		update_registers(core);
 	}
-
-	if (ucode & num8_to_ab)
-		core->ab = num8 << 3;
 
 	if (ucode & dec_sp)
 		core->registers[SP] -= bitwidth;
@@ -257,6 +250,9 @@ void core_step(struct Core* core) {
 			return;
 		}
 	}
+
+	if (ucode & num8_to_core_int)
+		core_int(core, num8);
 
 
 	// 1 stage
@@ -331,13 +327,13 @@ void core_step(struct Core* core) {
 		core->registers[SP] += bitwidth;
 
 	if (ucode & flag_to_sdb)
-		core->sdb = core->registers[FLAG];
+		core->sdb = core->registersu[FLAG];
 
 	if (ucode & state_to_sdb)
 		core->sdb = core->state;
 
 	if (ucode & tp_to_sdb)
-		core->sdb = core->registers[TP];
+		core->sdb = core->registersu[TP];
 
 	if (ucode & r3_to_pc)
 		core->registers[PC] = core->registers[r3];
@@ -352,14 +348,26 @@ void core_step(struct Core* core) {
 		core->registersu[r1] = core->sdb;
 
 	if (ucode & sdb_to_flag)
-		core->registers[FLAG] = core->sdb;
-
-	if (ucode & sdb_to_pc)
-		core->registers[PC] = core->sdb;
+		core->registersu[FLAG] = core->sdb;
 
 	if (ucode & sdb_to_state)
 		core->state = core->sdb;
 
 	if (ucode & sdb_to_tp)
-		core->registers[TP] = core->sdb;
+		core->registersu[TP] = core->sdb;
+}
+
+
+void core_int(struct Core* core, char id) {
+	core->int_queue[++core->int_queue_head] = id;
+}
+
+
+void core_handle_interrupt(struct Core* core) {
+	char id = core->int_queue[core->int_queue_tail++];
+
+	core->state |= ISINTERRUPT;
+
+	char perm;
+	core->registersk[PC] = mmu_read(&core->cpu->mmu, 0, 0, id * 8, &perm);
 }
