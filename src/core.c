@@ -48,8 +48,8 @@ static int opcode_len[] = {
 
 
 static uint64_t opcodes[] = {
-	[sto]	 = read_r2 | read_num64 | ALU_sum | sdb_to_ab | bus_reset | r3_to_sdb | write,
-	[loa]	 = read_r2 | read_num64 | ALU_sum | sdb_to_ab | bus_reset | read | sdb_to_r1,
+	[sto]	 = read_r2 | read_num64 | ALU_sum | sdb_to_ab | bus_reset | r3_to_sdb | _write,
+	[loa]	 = read_r2 | read_num64 | ALU_sum | sdb_to_ab | bus_reset | _read | sdb_to_r1,
 	[add]	 = read_r2 | read_r3 | ALU_sum | sdb_to_r1,
 	[sub]	 = read_r2 | read_r3 | ALU_sub | sdb_to_r1,
 	[mul]	 = 0,
@@ -72,10 +72,10 @@ static uint64_t opcodes[] = {
 	[xorn]	 = 0,
 	[shln]	 = 0,
 	[shrn]	 = 0,
-	[push]	 = read_sp | ALU_sum | sdb_to_ab | r3_to_sdb | write | dec_sp,
-	[pop]	 = read_sp | ALU_sum | sdb_to_ab | read | sdb_to_r1 | inc_sp,
-	[call]	 = read_sp | ALU_sum | sdb_to_ab | pc_to_sdb | write | dec_sp | r3_to_pc,
-	[iint]	 = inter_on | num8_to_ab | read | sdb_to_pc,
+	[push]	 = read_sp | ALU_sum | sdb_to_ab | r3_to_sdb | _write | dec_sp,
+	[pop]	 = read_sp | ALU_sum | sdb_to_ab | _read | sdb_to_r1 | inc_sp,
+	[call]	 = read_sp | ALU_sum | sdb_to_ab | pc_to_sdb | _write | dec_sp | r3_to_pc,
+	[iint]	 = inter_on | num8_to_ab | _read | sdb_to_pc,
 	[iret]	 = inter_off,
 	[chst]	 = is_usermode | read_r2 | ALU_sum | sdb_to_state,
 	[lost]	 = is_usermode | state_to_sdb | sdb_to_r1,
@@ -85,6 +85,8 @@ static uint64_t opcodes[] = {
 	[lotp]	 = is_usermode | tp_to_sdb | sdb_to_r1,
 	[chflag] = is_usermode | read_r2 | ALU_sum | sdb_to_flag,
 	[loflag] = is_usermode | flag_to_sdb | sdb_to_r1,
+	[utok]   = is_usermode | r3_u_to_sdb | sdb_to_r1,
+	[ktou]   = is_usermode | r3_to_sdb | sdb_to_r1_u,
 };
 
 
@@ -303,18 +305,24 @@ void core_step(struct Core* core) {
 	if (ucode & r3_to_sdb)
 		core->sdb = core->registers[r3];
 
+	if (ucode & r3_u_to_sdb)
+		core->sdb = core->registersu[r3];
+
+	if (ucode & pc_to_sdb)
+		core->sdb = core->registers[PC];
+
 
 	core->registers[PC] += opcode_len[opcode] * 8;
 
 
 	// 6 stage
 
-	if (ucode & write)
+	if (ucode & _write)
 		mmu_write(&core->cpu->mmu,
 		          core->state & PAGING, core->registers[TP],
 		          core->ab, bitwidth, core->sdb);
 
-	if (ucode & read)
+	if (ucode & _read)
 		core->sdb = mmu_read(&core->cpu->mmu,
 		          core->state & PAGING, core->registers[TP],
 		          core->ab, &perm) & bitmask;
@@ -339,6 +347,9 @@ void core_step(struct Core* core) {
 
 	if (ucode & sdb_to_r1)
 		core->registers[r1] = core->sdb;
+
+	if (ucode & sdb_to_r1_u)
+		core->registersu[r1] = core->sdb;
 
 	if (ucode & sdb_to_flag)
 		core->registers[FLAG] = core->sdb;

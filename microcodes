@@ -8,6 +8,7 @@ sdb -> ab
 sdb -> flag
 sdb -> pc
 sdb -> r1
+sdb -> r1_u
 sdb -> state
 sdb -> tp
 state -> sdb
@@ -21,6 +22,7 @@ tp -> sdb
 считать r2
 считать r3
 считать r3 -> sdb
+считать r3_u -> sdb
 считать sp
 увеличение sp
 уменьшение sp
@@ -56,6 +58,7 @@ tp -> sdb
 
 5 stage:
 	считать r3 -> sdb
+	считать r3_u -> sdb
 	считать pc -> sdb
 
 тут будет pc += размер инструкции
@@ -73,6 +76,7 @@ tp -> sdb
 
 7 stage:
 	sdb -> r1
+	sdb -> r1_u
 	sdb -> flag
 	sdb -> pc
 	sdb -> state

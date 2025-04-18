@@ -64,42 +64,44 @@ enum Instruction {
 	lotp   = 0x28,
 	chflag = 0x29,
 	loflag = 0x2a,
+	utok   = 0x2b,
+	ktou   = 0x2c,
 };
 
 
-enum Microcodes {
-	inter_off    = 1 << 1,
-	inter_on     = 1 << 2,
-	pc_to_sdb    = 1 << 3,
-	r3_to_pc     = 1 << 4,
-	num8_to_ab   = 1 << 5,
-	sdb_to_ab    = 1 << 6,
-	sdb_to_flag  = 1 << 7,
-	sdb_to_pc    = 1 << 8,
-	sdb_to_r1    = 1 << 9,
-	sdb_to_state = 1 << 10,
-	sdb_to_tp    = 1 << 11,
-	state_to_sdb = 1 << 12,
-	tp_to_sdb    = 1 << 13,
-	flag_to_sdb  = 1 << 14,
-	write        = 1 << 15,
-	read         = 1 << 16,
-	is_usermode  = 1 << 17,
-	is_zero      = 1 << 18,
-	is_carry     = 1 << 19,
-	is_sign      = 1 << 20,
-	bus_reset    = 1 << 21,
-	read_num64   = 1 << 22,
-	read_r2      = 1 << 23,
-	read_r3      = 1 << 24,
-	r3_to_sdb    = 1 << 25,
-	read_sp      = 1 << 26,
-	inc_sp       = 1 << 27,
-	dec_sp       = 1 << 28,
-	ALU_sum      = 1 << 29,
-	ALU_sub      = 1 << 30,
-	// TODO: other ALU operations
-};
+#define inter_off    (1l << 0)
+#define inter_on     (1l << 1)
+#define pc_to_sdb    (1l << 2)
+#define r3_to_pc     (1l << 3)
+#define num8_to_ab   (1l << 4)
+#define sdb_to_ab    (1l << 5)
+#define sdb_to_flag  (1l << 6)
+#define sdb_to_pc    (1l << 7)
+#define sdb_to_r1    (1l << 8)
+#define sdb_to_r1_u  (1l << 9)
+#define sdb_to_state (1l << 10)
+#define sdb_to_tp    (1l << 11)
+#define state_to_sdb (1l << 12)
+#define tp_to_sdb    (1l << 13)
+#define flag_to_sdb  (1l << 14)
+#define _write       (1l << 15)
+#define _read        (1l << 16)
+#define is_usermode  (1l << 17)
+#define is_zero      (1l << 18)
+#define is_carry     (1l << 19)
+#define is_sign      (1l << 20)
+#define bus_reset    (1l << 21)
+#define read_num64   (1l << 22)
+#define read_r2      (1l << 23)
+#define read_r3      (1l << 24)
+#define r3_to_sdb    (1l << 25)
+#define r3_u_to_sdb  (1l << 26)
+#define read_sp      (1l << 27)
+#define inc_sp       (1l << 28)
+#define dec_sp       (1l << 29)
+#define ALU_sum      (1l << 30)
+#define ALU_sub      (1l << 31)
+// TODO: other ALU operations
 
 
 struct Opcodes {

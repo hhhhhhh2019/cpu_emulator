@@ -2,8 +2,8 @@
 - [ ] SIMD
 - [ ] полное и занковое(или как это по-русски называется) умножение
 - [ ] деление со знаком
-- [ ] stou, loau
-  - [ ] инструкции для переноса значений из user r.f. в kernel r.f. и наоборот
+- [-] stou, loau
+  - [X] инструкции для переноса значений из user r.f. в kernel r.f. и наоборот
   - [ ] нужны ли тогда stou и loau?
 - [ ] понять, нужны ли прерывания в kernel mode
 - [ ] при чтении 8 битного отриц. числа в 64 битное надо сохранить знак
@@ -150,6 +150,16 @@ loflag:
 2) flag -> sdb
 3) sdb -> r1
 
+utok:
+1) проверка USERMODE
+2) считать r3_u -> sdb
+3) sdb -> r1
+
+ktou:
+1) проверка USERMODE
+2) считать r3 -> sdb
+3) sdb -> r1_u
+
 | Имя          | Описание            |
 |--------------+---------------------|
 | inter_off    | ISINTERRUPT off     |
@@ -161,6 +171,7 @@ loflag:
 | sdb_to_flag  | sdb -> flag         |
 | sdb_to_pc    | sdb -> pc           |
 | sdb_to_r1    | sdb -> r1           |
+| sdb_to_r1_u  | sdb -> r1_u         |
 | sdb_to_state | sdb -> state        |
 | sdb_to_tp    | sdb -> tp           |
 | state_to_sdb | state -> sdb        |
@@ -174,6 +185,7 @@ loflag:
 | read_r2      | считать r2          |
 | read_r3      | считать r3          |
 | r3_to_sdb    | считать r3 -> sdb   |
+| r3_u_to_sdb  | считать r3_u -> sdb |
 | read_sp      | считать sp          |
 | inc_sp       | увеличение sp       |
 | dec_sp       | уменьшение sp       |
@@ -232,5 +244,7 @@ loflag:
 | 34 | lotp   | r         |                                                      |
 | 35 | chflag | r         |                                                      |
 | 36 | loflag | r         |                                                      |
+| 37 | utok   | r r       | переносит r3 из user r.f. в r1 из kernel r.f.        |
+| 38 | ktou   | r r       |                                                      |
 #+TBLFM: $1=@#-2
 #+TBLFM: $1='(format "%x" $1)
