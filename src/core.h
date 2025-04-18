@@ -106,7 +106,7 @@ enum Instruction {
 
 struct Opcodes {
 	uint8_t count;
-	enum Microcodes* microcodes;
+	long* microcodes;
 };
 
 #define INSTRUCTION(...) \
