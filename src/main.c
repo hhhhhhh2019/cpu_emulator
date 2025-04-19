@@ -36,6 +36,8 @@ int main() {
 
 	memcpy(motherboard.ram + BIOS_OFFSET, motherboard.bios, motherboard.bios_size);
 
+
+	// MMU init
 	motherboard.cpu = (struct CPU){
 		.motherboard = &motherboard,
 		.cores_number = 1,
@@ -43,9 +45,20 @@ int main() {
 	};
 	mmu_init(&motherboard.cpu.mmu, &motherboard.cpu);
 
+
+	// APIC init
 	for (int i = 0; i < 256; i++)
 		motherboard.cpu.apic.int_table[i] = 0;
 
+	motherboard.devices = realloc(
+		motherboard.devices,
+		sizeof(void*) * (++motherboard.devices_count)
+	);
+	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->type = APIC;
+	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->registers = motherboard.cpu.apic.int_table;
+
+
+	// CPU init
 	for (int i = 0; i < motherboard.cpu.cores_number; i++) {
 		motherboard.cpu.cores[i].cpu = &motherboard.cpu;
 		for (int j = 0; j < 18; j++)
@@ -56,8 +69,10 @@ int main() {
 	motherboard.cpu.cores[0].state = ENABLED;
 	motherboard.cpu.cores[0].registersk[PC] = BIOS_OFFSET;
 
+
 	while (1) {
 		getchar();
+		mmu_step(&motherboard.cpu.mmu);
 		for (int i = 0; i < motherboard.cpu.cores_number; i++)
 			core_step(&motherboard.cpu.cores[i]);
 	}

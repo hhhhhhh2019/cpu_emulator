@@ -7,6 +7,17 @@
 #include <stdint.h>
 
 
+enum Device_type {
+	APIC,
+	TIMER,
+};
+
+struct Device {
+	enum Device_type type;
+	char* registers;
+};
+
+
 struct Motherboard {
 	uint64_t ram_size;
 	uint8_t* ram;
@@ -15,6 +26,9 @@ struct Motherboard {
 	uint8_t* bios;
 
 	struct CPU cpu;
+
+	int devices_count;
+	void** devices;
 };
 
 

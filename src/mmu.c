@@ -38,6 +38,7 @@ void mmu_step(struct MMU* mmu) {
 	mmu->registers[0] = 0;
 
 	if (cmd == MMU_CMD_RESET) {
+		printf("MMU reset devices\n");
 		mmu->mmio_count = 0;
 		free(mmu->mmio);
 		mmu->mmio = malloc(0);
@@ -46,11 +47,13 @@ void mmu_step(struct MMU* mmu) {
 	}
 
 	else if (cmd == MMU_CMD_ADD) {
+		printf("MMU map device: %d %d %d\n", DEVICEID, addrstart, size);
 		mmu->mmio = realloc(mmu->mmio, sizeof(struct MMIO) * (++mmu->mmio_count));
 		mmu->mmio[mmu->mmio_count - 1] = (struct MMIO){
 			.addr_start = addrstart,
 			.size = size,
-			/* .registers = */
+			.registers =
+			    ((struct Device*)mmu->cpu->motherboard->devices[DEVICEID])->registers
 		};
 	}
 }
@@ -62,7 +65,7 @@ uint64_t mmu_read(struct MMU* mmu, char vaddr, uint64_t tp, uint64_t addr, char*
 	}
 
 	for (int i = 0; i < mmu->mmio_count; i++) {
-		if (mmu->mmio[i].addr_start < addr || addr >= mmu->mmio[i].addr_start + mmu->mmio[i].size)
+		if (addr < mmu->mmio[i].addr_start || addr >= mmu->mmio[i].addr_start + mmu->mmio[i].size)
 			continue;
 
 		addr -= mmu->mmio[i].addr_start;
@@ -82,17 +85,19 @@ void mmu_write(struct MMU* mmu, char vaddr, uint64_t tp, uint64_t addr, char siz
 	}
 
 	for (int i = 0; i < mmu->mmio_count; i++) {
-		if (mmu->mmio[i].addr_start < addr || addr >= mmu->mmio[i].addr_start + mmu->mmio[i].size)
+		if (addr < mmu->mmio[i].addr_start || addr >= mmu->mmio[i].addr_start + mmu->mmio[i].size)
 			continue;
 
 		addr -= mmu->mmio[i].addr_start;
 
-		for (int j = 0; j < size; j++)
+		for (int j = 0; j < size / 8; j++)
 			mmu->mmio[i].registers[addr + j] = (value >> (j * 8)) & 0xff;
+
+		return;
 	}
 
-	for (int j = 0; j < size; j++) {
-		mmu->cpu->motherboard->ram[addr + j] = (value >> (j * 8)) & 0xff;
+	for (int j = 0; j < size / 8; j++) {
 		printf("write: %02lx to %lx\n", (value >> (j * 8)) & 0xff, addr + j);
+		mmu->cpu->motherboard->ram[addr + j] = (value >> (j * 8)) & 0xff;
 	}
 }
