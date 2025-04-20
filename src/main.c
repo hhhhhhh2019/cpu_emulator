@@ -14,6 +14,19 @@
 struct Motherboard motherboard;
 
 
+
+static unsigned long gcd(unsigned long a, unsigned long b) {
+	if (a % b == 0)
+		return b;
+	if (b % a == 0)
+		return a;
+	if (a > b)
+		return gcd(a % b, a);
+	else
+		return gcd(b, b % a);
+}
+
+
 int main() {
 	char* bios_filename = "bios";
 

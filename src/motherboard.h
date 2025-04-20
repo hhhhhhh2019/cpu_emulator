@@ -14,6 +14,7 @@ enum Device_type {
 
 struct Device {
 	enum Device_type type;
+	unsigned long hz;
 	char* registers;
 };
 

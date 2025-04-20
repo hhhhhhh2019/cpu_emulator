@@ -114,6 +114,7 @@ struct Opcodes {
 struct CPU;
 struct Core {
 	struct CPU* cpu;
+	unsigned long hz;
 
 	uint64_t registersk[18];
 	uint64_t registersu[18];
