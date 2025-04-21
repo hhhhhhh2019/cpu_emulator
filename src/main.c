@@ -1,6 +1,7 @@
 #include "core.h"
 #include "mmu.h"
 #include "motherboard.h"
+#include "timer.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +14,12 @@
 
 struct Motherboard motherboard;
 
+#define ADD_DEVICE(device) \
+	motherboard.devices = realloc( \
+		motherboard.devices, \
+		sizeof(struct Device*) * (++motherboard.devices_count) \
+	); \
+	motherboard.devices[motherboard.devices_count - 1] = (struct Device*)device; \
 
 
 static unsigned long gcd(unsigned long a, unsigned long b) {
@@ -62,17 +69,16 @@ int main() {
 	// APIC init
 	for (int i = 0; i < 256; i++)
 		motherboard.cpu.apic.int_table[i] = 0;
+	motherboard.cpu.apic.cpu = &motherboard.cpu;
 
-	motherboard.devices = realloc(
-		motherboard.devices,
-		sizeof(struct Device*) * (++motherboard.devices_count)
-	);
-	motherboard.devices[motherboard.devices_count - 1] = malloc(sizeof(struct Device));
+	ADD_DEVICE(malloc(sizeof(struct Device)));
 	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->type = APIC;
+	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->hz = 1000;
 	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->registers = motherboard.cpu.apic.int_table;
 
 
 	// CPU init
+	motherboard.cpu.cores[0].hz = 1000;
 	for (int i = 0; i < motherboard.cpu.cores_number; i++) {
 		motherboard.cpu.cores[i].cpu = &motherboard.cpu;
 		for (int j = 0; j < 18; j++)
@@ -82,6 +88,14 @@ int main() {
 	}
 	motherboard.cpu.cores[0].state = ENABLED;
 	motherboard.cpu.cores[0].registersk[PC] = BIOS_OFFSET;
+
+
+	// devices
+
+	// timer
+	struct Timer* timer = malloc(sizeof(struct Timer));
+	timer_init(timer, &motherboard, 1000);
+	ADD_DEVICE(timer);
 
 
 	// setup hz
@@ -94,14 +108,39 @@ int main() {
 	for (int i = 0; i < motherboard.devices_count; i++)
 		hz[i + 1 + motherboard.cpu.cores_number] = &motherboard.devices[i]->hz;
 
-	for (int i = 0; i < hz_count; i++)
-		printf("%lu\n", *hz[i]);
+	int del = *hz[0];
 
+	for (int i = 1; i < hz_count; i++)
+		del = gcd(del, *hz[i]);
+
+	for (int i = 0; i < hz_count; i++)
+		*hz[i] = *hz[i] / del;
+
+	// TODO: hz -> period
+
+
+	unsigned long tick = 0;
 
 	while (1) {
 		getchar();
-		mmu_step(&motherboard.cpu.mmu);
+
+		for (int i = 0; i < motherboard.devices_count; i++) {
+			if (tick % motherboard.devices[i]->hz != 0)
+				continue;
+			printf("%d: %lu %d\n", i, tick % motherboard.devices[i]->hz, motherboard.devices[i]->type);
+
+			switch (motherboard.devices[i]->type) {
+				case (APIC): break;
+				case (TIMER): timer_step((struct Timer*)motherboard.devices[i]); break;
+			}
+		}
+
+		if (tick % motherboard.cpu.mmu.hz == 0)
+			mmu_step(&motherboard.cpu.mmu);
+
 		for (int i = 0; i < motherboard.cpu.cores_number; i++)
 			core_step(&motherboard.cpu.cores[i]);
+
+		tick++;
 	}
 }

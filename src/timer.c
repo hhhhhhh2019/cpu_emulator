@@ -3,10 +3,13 @@
 #include "core.h"
 #include "motherboard.h"
 
+#include <stdio.h>
+
 
 void timer_init(struct Timer* timer, struct Motherboard* motherboard, unsigned long hz) {
 	for (int i = 0; i < 17; i++)
 		timer->registers[i] = 0;
+	timer->type = TIMER;
 	timer->motherboard = motherboard;
 	timer->hz = hz;
 
@@ -45,6 +48,8 @@ void timer_step(struct Timer* timer) {
 		return;
 
 	delay -= 1;
+
+	printf("timer: %lu\n", delay);
 
 	timer->registers[0] = (delay >> 0 * 8) & 0xff;
 	timer->registers[1] = (delay >> 1 * 8) & 0xff;
