@@ -29,7 +29,7 @@ struct Motherboard {
 	struct CPU cpu;
 
 	int devices_count;
-	void** devices;
+	struct Device** devices;
 };
 
 

@@ -26,6 +26,7 @@ struct MMIO {
 struct CPU;
 struct MMU {
 	struct CPU* cpu;
+	unsigned long hz;
 
 	char registers[11];
 
@@ -34,7 +35,7 @@ struct MMU {
 };
 
 
-void mmu_init(struct MMU*, struct CPU*);
+void mmu_init(struct MMU*, struct CPU*, unsigned long hz);
 void mmu_step(struct MMU*);
 
 

@@ -56,7 +56,7 @@ int main() {
 		.cores_number = 1,
 		.cores = malloc(sizeof(struct Core) * 1),
 	};
-	mmu_init(&motherboard.cpu.mmu, &motherboard.cpu);
+	mmu_init(&motherboard.cpu.mmu, &motherboard.cpu, 1000);
 
 
 	// APIC init
@@ -65,8 +65,9 @@ int main() {
 
 	motherboard.devices = realloc(
 		motherboard.devices,
-		sizeof(void*) * (++motherboard.devices_count)
+		sizeof(struct Device*) * (++motherboard.devices_count)
 	);
+	motherboard.devices[motherboard.devices_count - 1] = malloc(sizeof(struct Device));
 	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->type = APIC;
 	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->registers = motherboard.cpu.apic.int_table;
 
@@ -81,6 +82,20 @@ int main() {
 	}
 	motherboard.cpu.cores[0].state = ENABLED;
 	motherboard.cpu.cores[0].registersk[PC] = BIOS_OFFSET;
+
+
+	// setup hz
+
+	int hz_count = 1 + motherboard.devices_count + motherboard.cpu.cores_number;
+	unsigned long** hz = malloc(sizeof(unsigned long*) * hz_count);
+	hz[0] = &motherboard.cpu.mmu.hz;
+	for (int i = 0; i < motherboard.cpu.cores_number; i++)
+		hz[i + 1] = &motherboard.cpu.cores[i].hz;
+	for (int i = 0; i < motherboard.devices_count; i++)
+		hz[i + 1 + motherboard.cpu.cores_number] = &motherboard.devices[i]->hz;
+
+	for (int i = 0; i < hz_count; i++)
+		printf("%lu\n", *hz[i]);
 
 
 	while (1) {
