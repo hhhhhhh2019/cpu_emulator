@@ -7,7 +7,7 @@ LIBS=
 CC?=gcc
 LD=$(CC)
 
-CC_FLAGS = -c
+CC_FLAGS = -c -Wall -Werror
 LD_FLAGS =
 
 ifneq ($(LIBS),)

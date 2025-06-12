@@ -6,42 +6,44 @@
 #include <stdio.h>
 
 
-static int opcode_len[] = {
-	[sto]    = 2,
-	[loa]    = 2,
-	[add]    = 1,
-	[sub]    = 1,
-	[mul]    = 1,
-	[idiv]   = 1,
-	[addn]   = 2,
-	[subn]   = 2,
-	[muln]   = 2,
-	[divn]   = 2,
-	[addz]   = 2,
-	[addc]   = 2,
-	[adds]   = 2,
-	[notr]   = 1,
-	[andr]   = 1,
-	[orr]    = 1,
-	[xorr]   = 1,
-	[shl]    = 1,
-	[shr]    = 1,
-	[andn]   = 2,
-	[orn]    = 2,
-	[xorn]   = 2,
-	[shln]   = 2,
-	[shrn]   = 2,
-	[push]   = 1,
-	[pop]    = 1,
-	[call]   = 1,
-	[iint]   = 1,
-	[iret]   = 1,
-	[chst]   = 1,
-	[lost]   = 1,
-	[chtp]   = 1,
-	[lotp]   = 1,
-	[chflag] = 1,
-	[loflag] = 1,
+static int opcode_len[] = { // in bytes
+	[sto]    = 4 * 3,
+	[loa]    = 4 * 3,
+	[add]    = 4 * 1,
+	[sub]    = 4 * 1,
+	[mul]    = 4 * 1,
+	[idiv]   = 4 * 1,
+	[addn]   = 4 * 3,
+	[subn]   = 4 * 3,
+	[muln]   = 4 * 3,
+	[divn]   = 4 * 3,
+	[addz]   = 4 * 3,
+	[addc]   = 4 * 3,
+	[adds]   = 4 * 3,
+	[notr]   = 4 * 1,
+	[andr]   = 4 * 1,
+	[orr]    = 4 * 1,
+	[xorr]   = 4 * 1,
+	[shl]    = 4 * 1,
+	[shr]    = 4 * 1,
+	[andn]   = 4 * 3,
+	[orn]    = 4 * 3,
+	[xorn]   = 4 * 3,
+	[shln]   = 4 * 3,
+	[shrn]   = 4 * 3,
+	[push]   = 4 * 1,
+	[pop]    = 4 * 1,
+	[call]   = 4 * 1,
+	[iint]   = 4 * 1,
+	[iret]   = 4 * 1,
+	[chst]   = 4 * 1,
+	[lost]   = 4 * 1,
+	[chtp]   = 4 * 1,
+	[lotp]   = 4 * 1,
+	[chflag] = 4 * 1,
+	[loflag] = 4 * 1,
+	[utok]   = 4 * 1,
+	[ktou]   = 4 * 1,
 };
 
 
@@ -158,7 +160,15 @@ static inline void alu(struct Core* core, enum ALU_OP op, int bitwidth) {
 			((((uint64_t)-1) - core->rout1) > core->rout2) ? carry : 0; break;
 		case SUB: core->registers[FLAG] |=
 			(core->rout2 > core->rout1) ? carry : 0; break;
-		// TODO
+		case (MUL): // TODO
+		case (DIV):
+		case (NOT):
+		case (AND):
+		case (OR):
+		case (XOR):
+		case (SHL):
+		case (SHR):
+			break;
 	}
 }
 
@@ -191,12 +201,12 @@ void core_step(struct Core* core) {
 	print_registers(core);
 
 	char perm;
-	unsigned long instruction = mmu_read(&core->cpu->mmu,
+	unsigned int instruction = mmu_read(&core->cpu->mmu,
 										 core->state & PAGING, core->registers[TP],
 										 core->registers[PC], &perm);
 	unsigned long num64 = mmu_read(&core->cpu->mmu,
 										 core->state & PAGING, core->registers[TP],
-										 core->registers[PC] + 8, &perm);
+										 core->registers[PC] + 4, &perm);
 
 	uint8_t opcode   = instruction & 0xff;
 	uint8_t r1       = (instruction >> 8) & 0xf;
@@ -308,7 +318,7 @@ void core_step(struct Core* core) {
 		core->sdb = core->registers[PC];
 
 
-	core->registers[PC] += opcode_len[opcode] * 8;
+	core->registers[PC] += opcode_len[opcode];
 
 
 	// 6 stage
