@@ -227,7 +227,7 @@ void core_step(struct Core* core) {
 
 	if (ucode & is_usermode) {
 		if (!is_kernel_mode(core)) {
-			core->registers[PC] += opcode_len[opcode] * 8;
+			core->registers[PC] += opcode_len[opcode];
 			return;
 		}
 	}
@@ -242,21 +242,21 @@ void core_step(struct Core* core) {
 
 	if (ucode & is_zero) {
 		if ((core->registers[FLAG] & zero) == 0) {
-			core->registers[PC] += opcode_len[opcode] * 8;
+			core->registers[PC] += opcode_len[opcode];
 			return;
 		}
 	}
 
 	if (ucode & is_carry) {
 		if ((core->registers[FLAG] & carry) == 0) {
-			core->registers[PC] += opcode_len[opcode] * 8;
+			core->registers[PC] += opcode_len[opcode];
 			return;
 		}
 	}
 
 	if (ucode & is_sign) {
 		if ((core->registers[FLAG] & sign) == 0) {
-			core->registers[PC] += opcode_len[opcode] * 8;
+			core->registers[PC] += opcode_len[opcode];
 			return;
 		}
 	}
