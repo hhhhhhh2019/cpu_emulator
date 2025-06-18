@@ -94,7 +94,7 @@ int main() {
 
 	// timer
 	struct Timer* timer = malloc(sizeof(struct Timer));
-	timer_init(timer, &motherboard, 10000);
+	timer_init(timer, &motherboard, 1000);
 	ADD_DEVICE(timer);
 
 

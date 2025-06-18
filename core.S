@@ -1,0 +1,5 @@
+#define ENABLED     (1 << 0)
+#define INTERRUPTS  (1 << 1)
+#define PAGING      (1 << 2)
+#define USERMODE    (1 << 3)
+#define ISINTERRUPT (1 << 4)
