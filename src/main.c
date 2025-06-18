@@ -35,7 +35,7 @@ static unsigned long gcd(unsigned long a, unsigned long b) {
 
 
 int main() {
-	char* bios_filename = "bios";
+	char* bios_filename = "bios.bin";
 
 	motherboard.ram_size = 1024 * 1024 * 1024;  // 1 GiB
 	motherboard.ram = malloc(motherboard.ram_size);

@@ -7,6 +7,8 @@ LIBS=
 CC?=gcc
 LD=$(CC)
 
+AS=rust_as
+
 CC_FLAGS = -c -Wall -Werror
 LD_FLAGS =
 
@@ -25,11 +27,16 @@ endif
 SOURCES = $(wildcard src/*.c)
 OBJECTS = $(SOURCES:src/%.c=build/%.o)
 
+BIOS_SOURCES = $(wildcard bios/*.S)
+
+all: $(OBJECTS) bios
+	$(LD) $(LD_FLAGS) $(OBJECTS) -o $(OUT)
+
 build/%.o: src/%.c
 	$(CC) $(CC_FLAGS) $^ -o $@
 
-all: $(OBJECTS)
-	$(LD) $(LD_FLAGS) $^ -o $(OUT)
+bios: $(SOURCES)
+	$(AS) bios/bios.S bios.bin
 
 clean:
 	rm -f build/*
