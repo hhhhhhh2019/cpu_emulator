@@ -22,7 +22,8 @@ start:
 
 ivt_loop:
 	loaL r5, r1, 0
-	addn r5, r5, BIOS_OFFSET
+	subn r5, r5, $
+	add r5, r5, pc
 	stoL r5, r2, 0
 
 	add r1, r1, r4
