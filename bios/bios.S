@@ -6,77 +6,45 @@ addn pc, pc, start - $
 #include "devices.S"
 
 
-vectors:
-	dl irq0
-	dl irq1
-	dl irq2
-vectors_end:
-
-
 start:
-	// write interrupt table to memory
-	addn r1, pc, vectors - $
-	add r2, r0, r0
-	addn r3, pc, vectors_end - $
-	addn r4, r0, 8
-
-ivt_loop:
-	loaL r5, r1, 0
-	subn r5, r5, $
-	add r5, r5, pc
-	stoL r5, r2, 0
-
-	add r1, r1, r4
-	add r2, r2, r4
-
-	sub r0, r1, r3
-	addz pc, pc, ivt_loop_end - $
-	addn pc, pc, ivt_loop - $
-ivt_loop_end:
-
-	// add TIMER MMIO
+	// add timer mmio
 	addn r1, r0, MMU_MMIO_ADDR
 
 	addn r2, r0, TIMER_DEVICE_ID
 	stoS r2, r1, MMU_REG_DEVICEID
 
 	addn r2, r0, TIMER_MMIO_ADDR
-	stoS r2, r1, MMU_REG_STARTADDR
+	stoI r2, r1, MMU_REG_STARTADDR
 
-	addn r2, r0, 17
-	stoS r2, r1, MMU_REG_SIZE
+	addn r2, r0, 24
+	stoI r2, r1, MMU_REG_SIZE
 
 	addn r2, r0, MMU_CMD_ADD
 	stoB r2, r1, MMU_REG_CMD
 
-	// enable interrupts
 
-	addn r1, r0, ENABLED | INTERRUPTS
-	chst r1
-
-
-	// set timer
-
+	// setup timer
 	addn r1, r0, TIMER_MMIO_ADDR
 
-	addn r2, r0, 1
-	stoB r2, r1, TIMER_REG_INTERRUPT
+	addn r2, pc, timer_irq - $
+	stoL r2, r1, TIMER_REG_INTERRUPT
 
+	// enable timer
 	addn r2, r0, 10
 	stoL r2, r1, TIMER_REG_DELAY
 
-loop:
-	addn pc, pc, loop - $
+
+	// enable interrupts
+	addn r1, r0, ENABLED | INTERRUPTS
+	chst r1
+
+	add pc, pc, r0
 
 
-irq0:
-	addn r1, r0, 1
-	chst r0
+timer_irq:
+	addn r10, r10, 1
 
-irq1:
-	addn r1, r0, 2
-	chst r0
+	addn r2, r0, 10
+	stoL r2, r0, TIMER_MMIO_ADDR + TIMER_REG_DELAY
 
-irq2:
-	addn r1, r0, 3
-	chst r0
+	iret

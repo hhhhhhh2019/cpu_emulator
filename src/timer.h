@@ -8,7 +8,7 @@
 struct Timer {
 	enum Device_type type;
 	uint64_t hz;
-	char registers[24];
+	uint8_t registers[24];
 	struct Motherboard* motherboard;
 };
 

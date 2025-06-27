@@ -19,7 +19,7 @@
 struct MMIO {
 	uint64_t addr_start;
 	uint64_t size;
-	char* registers;
+	uint8_t* registers;
 };
 
 
@@ -28,7 +28,7 @@ struct MMU {
 	struct CPU* cpu;
 	uint64_t hz;
 
-	char registers[11];
+	uint8_t registers[11];
 
 	uint64_t mmio_count;
 	struct MMIO* mmio;

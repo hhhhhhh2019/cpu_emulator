@@ -14,4 +14,4 @@
 
 #define TIMER_REG_DELAY     0x0
 #define TIMER_REG_INTERRUPT 0x8
-#define TIMER_REG_HZ        0x9
+#define TIMER_REG_HZ        0x10

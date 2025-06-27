@@ -54,9 +54,7 @@ void mmu_step(struct MMU* mmu) {
 			.addr_start = addrstart,
 			.size = size,
 			.registers =
-			    (char*)&((struct Device*)mmu->cpu->motherboard->devices[DEVICEID])->registers
-			// честно, я не понимаю почему надо брать ссылку на registers,
-			// потому что registers и так должен быть ссылкой, но без этого выпадает segfault
+			    ((struct Device*)mmu->cpu->motherboard->devices[DEVICEID])->registers
 		};
 	}
 }
