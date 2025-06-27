@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 
-void timer_init(struct Timer* timer, struct Motherboard* motherboard, unsigned long hz) {
+void timer_init(struct Timer* timer, struct Motherboard* motherboard, uint64_t hz) {
 	for (int i = 0; i < 17; i++)
 		timer->registers[i] = 0;
 	timer->type = TIMER;
@@ -34,15 +34,15 @@ void timer_step(struct Timer* timer) {
 	timer->registers[15] = (timer->hz >> 6 * 8) & 0xff;
 	timer->registers[16] = (timer->hz >> 7 * 8) & 0xff;
 
-	unsigned long delay =
-		((long)timer->registers[0] << 0 * 8) |
-		((long)timer->registers[1] << 1 * 8) |
-		((long)timer->registers[2] << 2 * 8) |
-		((long)timer->registers[3] << 3 * 8) |
-		((long)timer->registers[4] << 4 * 8) |
-		((long)timer->registers[5] << 5 * 8) |
-		((long)timer->registers[6] << 6 * 8) |
-		((long)timer->registers[7] << 7 * 8);
+	uint64_t delay =
+		((uint64_t)timer->registers[0] << 0 * 8) |
+		((uint64_t)timer->registers[1] << 1 * 8) |
+		((uint64_t)timer->registers[2] << 2 * 8) |
+		((uint64_t)timer->registers[3] << 3 * 8) |
+		((uint64_t)timer->registers[4] << 4 * 8) |
+		((uint64_t)timer->registers[5] << 5 * 8) |
+		((uint64_t)timer->registers[6] << 6 * 8) |
+		((uint64_t)timer->registers[7] << 7 * 8);
 
 	if (delay == 0)
 		return;

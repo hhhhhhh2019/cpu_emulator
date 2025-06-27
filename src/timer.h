@@ -7,12 +7,12 @@
 
 struct Timer {
 	enum Device_type type;
-	unsigned long hz;
+	uint64_t hz;
 	char registers[17];
 	struct Motherboard* motherboard;
 };
 
-void timer_init(struct Timer*, struct Motherboard*, unsigned long hz);
+void timer_init(struct Timer*, struct Motherboard*, uint64_t hz);
 void timer_step(struct Timer*);
 
 

@@ -22,7 +22,7 @@ struct Motherboard motherboard;
 	motherboard.devices[motherboard.devices_count - 1] = (struct Device*)device; \
 
 
-static unsigned long gcd(unsigned long a, unsigned long b) {
+static uint64_t gcd(uint64_t a, uint64_t b) {
 	if (a % b == 0)
 		return b;
 	if (b % a == 0)
@@ -67,14 +67,14 @@ int main() {
 
 
 	// APIC init
-	for (int i = 0; i < 256; i++)
-		motherboard.cpu.apic.int_table[i] = 0;
+	/* for (int i = 0; i < 256; i++) */
+	/* 	motherboard.cpu.apic.int_table[i] = 0; */
 	motherboard.cpu.apic.cpu = &motherboard.cpu;
 
 	ADD_DEVICE(malloc(sizeof(struct Device)));
 	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->type = APIC;
 	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->hz = 1000;
-	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->registers = motherboard.cpu.apic.int_table;
+	/* ((struct Device*)motherboard.devices[motherboard.devices_count - 1])->registers = motherboard.cpu.apic.int_table; */
 
 
 	// CPU init
@@ -101,7 +101,7 @@ int main() {
 	// setup hz
 
 	int hz_count = 1 + motherboard.devices_count + motherboard.cpu.cores_number;
-	unsigned long** hz = malloc(sizeof(unsigned long*) * hz_count);
+	uint64_t** hz = malloc(sizeof(uint64_t*) * hz_count);
 	hz[0] = &motherboard.cpu.mmu.hz;
 	for (int i = 0; i < motherboard.cpu.cores_number; i++)
 		hz[i + 1] = &motherboard.cpu.cores[i].hz;
@@ -117,13 +117,13 @@ int main() {
 		*hz[i] = *hz[i] / del;
 
 
-	unsigned long ticks_in_sec = 1;
+	uint64_t ticks_in_sec = 1;
 
 	for (int i = 0; i < hz_count; i++)
 		ticks_in_sec *= *hz[i];
 
 
-	unsigned long tick = 0;
+	uint64_t tick = 0;
 
 	while (1) {
 		getchar();

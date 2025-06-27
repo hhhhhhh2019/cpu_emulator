@@ -16,7 +16,7 @@ static inline void mmu_add_self(struct MMU* mmu) {
 }
 
 
-void mmu_init(struct MMU* mmu, struct CPU* cpu, unsigned long hz) {
+void mmu_init(struct MMU* mmu, struct CPU* cpu, uint64_t hz) {
 	mmu->cpu = cpu;
 	mmu->hz = hz;
 

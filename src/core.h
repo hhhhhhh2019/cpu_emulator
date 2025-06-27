@@ -102,7 +102,7 @@ enum Instruction {
 
 struct Opcodes {
 	uint8_t count;
-	long* microcodes;
+	uint64_t* microcodes;
 };
 
 #define INSTRUCTION(...) \
@@ -114,7 +114,7 @@ struct Opcodes {
 struct CPU;
 struct Core {
 	struct CPU* cpu;
-	unsigned long hz;
+	uint64_t hz;
 
 	uint64_t registersk[18];
 	uint64_t registersu[18];

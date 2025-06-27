@@ -204,7 +204,7 @@ void core_step(struct Core* core) {
 	unsigned int instruction = mmu_read(&core->cpu->mmu,
 										 core->state & PAGING, core->registers[TP],
 										 core->registers[PC], &perm);
-	unsigned long num64 = mmu_read(&core->cpu->mmu,
+	uint64_t num64 = mmu_read(&core->cpu->mmu,
 										 core->state & PAGING, core->registers[TP],
 										 core->registers[PC] + 4, &perm);
 
