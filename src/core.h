@@ -121,6 +121,7 @@ struct Core {
 	uint64_t* registers;
 
 	uint64_t state;
+	uint64_t int_ret;
 
 	uint64_t sdb;
 	uint64_t ab;

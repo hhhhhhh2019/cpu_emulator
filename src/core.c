@@ -234,6 +234,7 @@ void core_step(struct Core* core) {
 
 	if (ucode & inter_off) {
 		core->state &= ~ISINTERRUPT;
+		core->registersk[PC] = core->int_ret;
 		update_registers(core);
 	}
 
@@ -375,12 +376,12 @@ void core_int(struct Core* core, uint64_t irq) {
 
 
 void core_handle_interrupt(struct Core* core) {
-	char id = core->int_queue[core->int_queue_tail++];
-	printf("int: %d\n", id);
+	uint64_t irq = core->int_queue[core->int_queue_tail++];
+	printf("int: %016lx\n", irq);
 	core->int_queue_tail %= 256;
 
 	core->state |= ISINTERRUPT;
 
-	char perm;
-	core->registersk[PC] = mmu_read(&core->cpu->mmu, 0, 0, id * 8, &perm);
+	core->int_ret = core->registersk[PC];
+	core->registersk[PC] = irq;
 }
