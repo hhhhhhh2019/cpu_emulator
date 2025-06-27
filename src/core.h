@@ -127,7 +127,7 @@ struct Core {
 	uint64_t rout1;
 	uint64_t rout2;
 
-	char int_queue[256];
+	uint64_t int_queue[256];
 	int int_queue_head;
 	int int_queue_tail;
 };
@@ -135,7 +135,7 @@ struct Core {
 
 void print_registers(struct Core*);
 void core_step(struct Core*);
-void core_int(struct Core*, char id);
+void core_int(struct Core*, uint64_t);
 void core_handle_interrupt(struct Core*);
 
 

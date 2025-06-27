@@ -368,8 +368,8 @@ void core_step(struct Core* core) {
 }
 
 
-void core_int(struct Core* core, char id) {
-	core->int_queue[core->int_queue_head++] = id;
+void core_int(struct Core* core, uint64_t irq) {
+	core->int_queue[core->int_queue_head++] = irq;
 	core->int_queue_head %= 256;
 }
 
