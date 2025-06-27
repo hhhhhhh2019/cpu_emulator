@@ -232,12 +232,6 @@ void core_step(struct Core* core) {
 		}
 	}
 
-	if (ucode & inter_off) {
-		core->state &= ~ISINTERRUPT;
-		core->registersk[PC] = core->int_ret;
-		update_registers(core);
-	}
-
 	if (ucode & dec_sp)
 		core->registers[SP] -= bitwidth;
 
@@ -323,6 +317,13 @@ void core_step(struct Core* core) {
 
 
 	// 6 stage
+
+	if (ucode & inter_off) {
+		core->state &= ~ISINTERRUPT;
+		core->registersk[PC] = core->int_ret;
+		update_registers(core);
+	}
+
 
 	if (ucode & _write)
 		mmu_write(&core->cpu->mmu,

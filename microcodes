@@ -33,7 +33,6 @@ tp -> sdb
 	проверка zero
 	проверка carry
 	проверка sign
-	ISINTERRUPT off
 	уменьшение sp
 	num8 -> core_int
 
@@ -60,6 +59,8 @@ tp -> sdb
 тут будет pc += размер инструкции
 
 6 stage:
+	ISINTERRUPT off
+
 	запись
 	чтение
 	увеличение sp
