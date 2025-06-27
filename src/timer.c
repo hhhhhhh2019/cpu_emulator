@@ -4,35 +4,35 @@
 #include "motherboard.h"
 
 #include <stdio.h>
+#include <string.h>
 
 
 void timer_init(struct Timer* timer, struct Motherboard* motherboard, uint64_t hz) {
-	for (int i = 0; i < 17; i++)
-		timer->registers[i] = 0;
+	memset(timer->registers, 0, sizeof(timer->registers));
 	timer->type = TIMER;
 	timer->motherboard = motherboard;
 	timer->hz = hz;
 
-	timer->registers[9]  = (timer->hz >> 0 * 8) & 0xff;
-	timer->registers[10] = (timer->hz >> 1 * 8) & 0xff;
-	timer->registers[11] = (timer->hz >> 2 * 8) & 0xff;
-	timer->registers[12] = (timer->hz >> 3 * 8) & 0xff;
-	timer->registers[13] = (timer->hz >> 4 * 8) & 0xff;
-	timer->registers[14] = (timer->hz >> 5 * 8) & 0xff;
-	timer->registers[15] = (timer->hz >> 6 * 8) & 0xff;
-	timer->registers[16] = (timer->hz >> 7 * 8) & 0xff;
+	timer->registers[8]  = (timer->hz >> 0 * 8) & 0xff;
+	timer->registers[9]  = (timer->hz >> 1 * 8) & 0xff;
+	timer->registers[10] = (timer->hz >> 2 * 8) & 0xff;
+	timer->registers[11] = (timer->hz >> 3 * 8) & 0xff;
+	timer->registers[12] = (timer->hz >> 4 * 8) & 0xff;
+	timer->registers[13] = (timer->hz >> 5 * 8) & 0xff;
+	timer->registers[14] = (timer->hz >> 6 * 8) & 0xff;
+	timer->registers[15] = (timer->hz >> 7 * 8) & 0xff;
 }
 
 
 void timer_step(struct Timer* timer) {
-	timer->registers[9]  = (timer->hz >> 0 * 8) & 0xff;
-	timer->registers[10] = (timer->hz >> 1 * 8) & 0xff;
-	timer->registers[11] = (timer->hz >> 2 * 8) & 0xff;
-	timer->registers[12] = (timer->hz >> 3 * 8) & 0xff;
-	timer->registers[13] = (timer->hz >> 4 * 8) & 0xff;
-	timer->registers[14] = (timer->hz >> 5 * 8) & 0xff;
-	timer->registers[15] = (timer->hz >> 6 * 8) & 0xff;
-	timer->registers[16] = (timer->hz >> 7 * 8) & 0xff;
+	timer->registers[8]  = (timer->hz >> 0 * 8) & 0xff;
+	timer->registers[9]  = (timer->hz >> 1 * 8) & 0xff;
+	timer->registers[10] = (timer->hz >> 2 * 8) & 0xff;
+	timer->registers[11] = (timer->hz >> 3 * 8) & 0xff;
+	timer->registers[12] = (timer->hz >> 4 * 8) & 0xff;
+	timer->registers[13] = (timer->hz >> 5 * 8) & 0xff;
+	timer->registers[14] = (timer->hz >> 6 * 8) & 0xff;
+	timer->registers[15] = (timer->hz >> 7 * 8) & 0xff;
 
 	uint64_t delay =
 		((uint64_t)timer->registers[0] << 0 * 8) |
@@ -43,6 +43,17 @@ void timer_step(struct Timer* timer) {
 		((uint64_t)timer->registers[5] << 5 * 8) |
 		((uint64_t)timer->registers[6] << 6 * 8) |
 		((uint64_t)timer->registers[7] << 7 * 8);
+
+
+	uint64_t irq =
+		((uint64_t)timer->registers[16] << 0 * 8) |
+		((uint64_t)timer->registers[17] << 1 * 8) |
+		((uint64_t)timer->registers[18] << 2 * 8) |
+		((uint64_t)timer->registers[19] << 3 * 8) |
+		((uint64_t)timer->registers[20] << 4 * 8) |
+		((uint64_t)timer->registers[21] << 5 * 8) |
+		((uint64_t)timer->registers[22] << 6 * 8) |
+		((uint64_t)timer->registers[23] << 7 * 8);
 
 	if (delay == 0)
 		return;
@@ -61,5 +72,5 @@ void timer_step(struct Timer* timer) {
 	timer->registers[7] = (delay >> 7 * 8) & 0xff;
 
 	if (delay == 0)
-		apic_interrupt(&timer->motherboard->cpu.apic, timer->registers[8]);
+		apic_interrupt(&timer->motherboard->cpu.apic, irq);
 }
