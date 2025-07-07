@@ -100,17 +100,6 @@ enum Instruction {
 // TODO: other ALU operations
 
 
-struct Opcodes {
-	uint8_t count;
-	uint64_t* microcodes;
-};
-
-#define INSTRUCTION(...) \
-	(struct Opcodes){ \
-		VA_ARGS_COUNT(__VA_ARGS__), \
-		(enum Microcodes[]){__VA_ARGS__}}
-
-
 struct CPU;
 struct Core {
 	struct CPU* cpu;

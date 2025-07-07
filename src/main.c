@@ -72,14 +72,14 @@ int main() {
 	motherboard.cpu.apic.cpu = &motherboard.cpu;
 
 	ADD_DEVICE(malloc(sizeof(struct Device)));
-	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->type = APIC;
-	((struct Device*)motherboard.devices[motherboard.devices_count - 1])->hz = 1000;
-	/* ((struct Device*)motherboard.devices[motherboard.devices_count - 1])->registers = motherboard.cpu.apic.int_table; */
+	motherboard.devices[motherboard.devices_count - 1]->type = APIC;
+	motherboard.devices[motherboard.devices_count - 1]->hz = 1000;
+	/* motherboard.devices[motherboard.devices_count - 1]->registers = motherboard.cpu.apic.int_table; */
 
 
 	// CPU init
-	motherboard.cpu.cores[0].hz = 1000;
 	for (int i = 0; i < motherboard.cpu.cores_number; i++) {
+		motherboard.cpu.cores[i].hz = 1000;
 		motherboard.cpu.cores[i].cpu = &motherboard.cpu;
 		for (int j = 0; j < 18; j++)
 			motherboard.cpu.cores[i].registersk[j] = 0;
