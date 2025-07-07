@@ -17,8 +17,11 @@
 - [X] MMIO
 - [X] аппаратные прерываня
 - [-] виртуальная память
-- [ ] syscall
+- [-] syscall
 - [X] рассмотреть возможность перехода на размер маш. слова в 12 байт с выравниванием в 4 байта
+- [ ] в инструкциях типа chflag можно использовать r3
+- [ ] починить инструкцию int
+  а оно вообще нужно?
 
 * Регистры
 
@@ -37,6 +40,8 @@
 К 16 и 17 регистру обращение происходит через специальные инструкции.
   
 все эти регистры содержатся в 2 экземлярах: для kernel mode и user mode
+
+есть общие регистры: state, intret(для возврата из прерываний), syscall
 
 за переключение между этими режимами отвечает флаг в регистре состояний ядра(см. ниже)
 
@@ -188,6 +193,15 @@ ktou:
 2) считать r3 -> sdb
 3) sdb -> r1_u
 
+setsyscall:
+1) проверка USERMODE
+2) считать r2
+3) сложить с 0(или я сделаю перенос с r1 в sdb)
+4) sdb -> syscall
+
+syscall:
+1) syscall
+
 | Имя              | Описание            |
 |------------------+---------------------|
 | inter_off        | ISINTERRUPT off     |
@@ -199,10 +213,12 @@ ktou:
 | sdb_to_r1        | sdb -> r1           |
 | sdb_to_r1_u      | sdb -> r1_u         |
 | sdb_to_state     | sdb -> state        |
+| sdb_to_syscall   | sdb -> syscalll     |
 | sdb_to_tp        | sdb -> tp           |
 | state_to_sdb     | state -> sdb        |
 | tp_to_sdb        | tp -> sdb           |
 | flag_to_sdb      | flag -> sdb         |
+| syscall          |                     |
 | write            | запись              |
 | read             | чтение              |
 | is_usermode      | проверка USERMODE   |
@@ -233,45 +249,47 @@ ktou:
 
   * 0..63 - num64
 
-|  № | Имя    | Аргументы | Описание                                      |
-|----+--------+-----------+-----------------------------------------------|
-|  0 | sto    | r r num64 |                                               |
-|  1 | loa    | r r num64 |                                               |
-|  2 | add    | r r r     |                                               |
-|  3 | sub    | r r r     |                                               |
-|  4 | mul    | r r r     |                                               |
-|  5 | div    | r r r     |                                               |
-|  6 | add    | r r num64 |                                               |
-|  7 | sub    | r r num64 |                                               |
-|  8 | mul    | r r num64 |                                               |
-|  9 | div    | r r num64 |                                               |
-| 10 | addz   | r r num64 |                                               |
-| 11 | addc   | r r num64 |                                               |
-| 12 | adds   | r r num64 |                                               |
-| 13 | not    | r r       |                                               |
-| 14 | and    | r r r     |                                               |
-| 15 | or     | r r r     |                                               |
-| 16 | xor    | r r r     |                                               |
-| 17 | shl    | r r r     |                                               |
-| 18 | shr    | r r r     |                                               |
-| 19 | and    | r r num64 |                                               |
-| 20 | or     | r r num64 |                                               |
-| 21 | xor    | r r num64 |                                               |
-| 22 | shl    | r r num64 |                                               |
-| 23 | shr    | r r num64 |                                               |
-| 24 | push   | r         |                                               |
-| 25 | pop    | r         |                                               |
-| 26 | call   | r         |                                               |
-| 27 | int    | num8      |                                               |
-| 28 | iret   |           |                                               |
-| 29 | chst   | r         |                                               |
-| 30 | lost   | r         |                                               |
-| 31 | chtp   | r         |                                               |
-| 32 | lotp   | r         |                                               |
-| 33 | chflag | r         |                                               |
-| 34 | loflag | r         |                                               |
-| 35 | utok   | r r       | переносит r3 из user r.f. в r1 из kernel r.f. |
-| 36 | ktou   | r r       |                                               |
+|  № | Имя        | Аргументы | Описание                                      |
+|----+------------+-----------+-----------------------------------------------|
+|  0 | sto        | r r num64 |                                               |
+|  1 | loa        | r r num64 |                                               |
+|  2 | add        | r r r     |                                               |
+|  3 | sub        | r r r     |                                               |
+|  4 | mul        | r r r     |                                               |
+|  5 | div        | r r r     |                                               |
+|  6 | add        | r r num64 |                                               |
+|  7 | sub        | r r num64 |                                               |
+|  8 | mul        | r r num64 |                                               |
+|  9 | div        | r r num64 |                                               |
+| 10 | addz       | r r num64 |                                               |
+| 11 | addc       | r r num64 |                                               |
+| 12 | adds       | r r num64 |                                               |
+| 13 | not        | r r       |                                               |
+| 14 | and        | r r r     |                                               |
+| 15 | or         | r r r     |                                               |
+| 16 | xor        | r r r     |                                               |
+| 17 | shl        | r r r     |                                               |
+| 18 | shr        | r r r     |                                               |
+| 19 | and        | r r num64 |                                               |
+| 20 | or         | r r num64 |                                               |
+| 21 | xor        | r r num64 |                                               |
+| 22 | shl        | r r num64 |                                               |
+| 23 | shr        | r r num64 |                                               |
+| 24 | push       | r         |                                               |
+| 25 | pop        | r         |                                               |
+| 26 | call       | r         |                                               |
+| 27 | int        | num8      |                                               |
+| 28 | iret       |           |                                               |
+| 29 | chst       | r         |                                               |
+| 30 | lost       | r         |                                               |
+| 31 | chtp       | r         |                                               |
+| 32 | lotp       | r         |                                               |
+| 33 | chflag     | r         |                                               |
+| 34 | loflag     | r         |                                               |
+| 35 | utok       | r r       | переносит r3 из user r.f. в r1 из kernel r.f. |
+| 36 | ktou       | r r       |                                               |
+| 37 | setsyscall | r         |                                               |
+| 38 | syscall    |           |                                               |
 #+TBLFM: $1=@#-2
 #+TBLFM: $1='(format "%x" $1)
 

@@ -35,6 +35,7 @@ tp -> sdb
 	проверка sign
 	уменьшение sp
 	num8 -> core_int
+	syscall -> core_int
 
 1 stage:
 	считать num64
@@ -76,4 +77,5 @@ tp -> sdb
 	sdb -> r1_u
 	sdb -> flag
 	sdb -> state
+	sdb -> syscall
 	sdb -> tp
