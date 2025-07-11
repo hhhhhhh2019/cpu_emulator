@@ -18,6 +18,11 @@
 #define USERMODE    (1 << 3)
 #define ISINTERRUPT (1 << 4)
 
+#define INIT  (1 << 0)
+#define READ  (1 << 1)
+#define WRITE (1 << 2)
+#define EXEC  (1 << 3)
+
 
 enum Flag {
 	zero  = 1 << 0,

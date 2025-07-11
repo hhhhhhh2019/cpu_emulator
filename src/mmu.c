@@ -1,4 +1,5 @@
 #include "mmu.h"
+#include "core.h"
 #include "cpu.h"
 #include "motherboard.h"
 
@@ -60,9 +61,36 @@ void mmu_step(struct MMU* mmu) {
 }
 
 
+uint64_t virt_to_phys(struct MMU* mmu, uint64_t vaddr, uint64_t tp, char* perm) {
+	uint64_t offset = (vaddr >>  0) & 0xffff;
+	uint64_t t1     = (vaddr >> 16) & 0xffff;
+	uint64_t t2     = (vaddr >> 24) & 0xffff;
+	uint64_t t3     = (vaddr >> 34) & 0xffff;
+	uint64_t t4     = (vaddr >> 44) & 0xffff;
+	uint64_t t5     = (vaddr >> 54) & 0xffff;
+
+	uint8_t* ram = mmu->cpu->motherboard->ram;
+
+	uint64_t t5_addr   = tp;
+	uint64_t t4_addr   = *(uint64_t*)(ram + t5_addr + t5 * 8); // i hope this will work everywhere
+	uint64_t t3_addr   = *(uint64_t*)(ram + t4_addr + t4 * 8);
+	uint64_t t2_addr   = *(uint64_t*)(ram + t3_addr + t3 * 8);
+	uint64_t t1_addr   = *(uint64_t*)(ram + t2_addr + t2 * 8);
+	uint64_t page_addr = *(uint64_t*)(ram + t1_addr + t1 * 8);
+
+	*perm = (page_addr >> 60) & 0b1111;
+
+	return page_addr & 0xfffffffffffffff0 + offset;
+}
+
+
 uint64_t mmu_read(struct MMU* mmu, char vaddr, uint64_t tp, uint64_t addr, char* perm) {
 	if (vaddr) {
-		// TODO
+		addr = virt_to_phys(mmu, addr, tp, perm);
+
+		if ((*perm & READ) == 0) {
+			// TODO
+		}
 	}
 
 	for (int i = 0; i < mmu->mmio_count; i++) {
@@ -82,7 +110,12 @@ uint64_t mmu_read(struct MMU* mmu, char vaddr, uint64_t tp, uint64_t addr, char*
 
 void mmu_write(struct MMU* mmu, char vaddr, uint64_t tp, uint64_t addr, char size, uint64_t value) {
 	if (vaddr) {
-		// TODO
+		char perm;
+		addr = virt_to_phys(mmu, addr, tp, &perm);
+
+		if ((perm & WRITE) == 0) {
+			// TODO
+		}
 	}
 
 	for (int i = 0; i < mmu->mmio_count; i++) {
