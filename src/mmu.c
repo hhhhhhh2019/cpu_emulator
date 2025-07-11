@@ -80,7 +80,7 @@ uint64_t virt_to_phys(struct MMU* mmu, uint64_t vaddr, uint64_t tp, char* perm) 
 
 	*perm = (page_addr >> 60) & 0b1111;
 
-	return page_addr & 0xfffffffffffffff0 + offset;
+	return (page_addr & 0x0fffffffffffffff) + offset;
 }
 
 
